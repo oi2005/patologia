@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAGE - Sistema de Aprendizagem e Mapeamento Epistemológico</title>
+    <title>SAGE - Patologia Geral Acadêmica</title>
     <style>
         :root {
             --bg-primary: #0d1117;
@@ -13,6 +13,7 @@
             --text-muted: #8b949e;
             --accent: #58a6ff;
             --accent-success: #2ea44f;
+            --content-bg: #1f242c;
         }
 
         body {
@@ -27,7 +28,7 @@
 
         .container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1100px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -36,13 +37,15 @@
         header {
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 15px;
+            text-align: center;
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 600;
             margin: 0 0 5px 0;
             color: #f0f6fc;
+            letter-spacing: 1px;
         }
 
         p.subtitle {
@@ -53,11 +56,11 @@
 
         .workspace {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 320px 1fr;
             gap: 20px;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 850px) {
             .workspace { grid-template-columns: 1fr; }
         }
 
@@ -69,10 +72,11 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            height: fit-content;
         }
 
         .panel-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -84,13 +88,13 @@
 
         textarea {
             width: 100%;
-            height: 380px;
+            height: 250px;
             background-color: var(--bg-primary);
             color: #79c0ff;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-            font-size: 12px;
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 11px;
             padding: 10px;
             resize: none;
             box-sizing: border-box;
@@ -101,8 +105,8 @@
             color: #ffffff;
             border: 1px solid rgba(240, 246, 252, 0.1);
             border-radius: 6px;
-            padding: 12px;
-            font-size: 14px;
+            padding: 10px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
@@ -111,63 +115,90 @@
         button:hover { background-color: #2c974b; }
 
         .output-container {
-            height: 440px;
-            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            padding-right: 4px;
+            gap: 24px;
         }
 
         .estagio-bloco {
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            background-color: var(--bg-primary);
+            background-color: var(--bg-secondary);
             overflow: hidden;
         }
 
         .estagio-header {
             background-color: rgba(88, 166, 255, 0.1);
             border-bottom: 1px solid var(--border-color);
-            padding: 8px 12px;
-            font-size: 12px;
+            padding: 10px 14px;
+            font-size: 13px;
             font-weight: bold;
             color: var(--accent);
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            background-color: var(--border-color);
+            padding: 2px 8px;
+            border-radius: 20px;
+            color: #f0f6fc;
+            font-size: 11px;
         }
 
         .card-topico {
-            padding: 12px;
+            padding: 16px;
             border-bottom: 1px solid var(--border-color);
         }
 
         .card-topico:last-child { border-bottom: none; }
 
         .topico-title {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             color: #f0f6fc;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .topico-desc {
             font-size: 13px;
-            color: var(--text-main);
-            margin-bottom: 6px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        .conteudo-academico {
+            background-color: var(--content-bg);
+            border-left: 3px solid var(--accent);
+            padding: 12px;
+            border-radius: 0 4px 4px 0;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #e6edf3;
+            margin-bottom: 12px;
+        }
+
+        .conteudo-academico ul {
+            margin: 6px 0 0 0;
+            padding-left: 20px;
+        }
+
+        .conteudo-academico li {
+            margin-bottom: 4px;
         }
 
         .topico-meta {
             font-size: 11px;
             color: var(--text-muted);
             font-family: monospace;
-        }
-
-        .badge {
-            background-color: var(--border-color);
-            padding: 2px 6px;
-            border-radius: 3px;
-            color: var(--text-main);
+            background-color: var(--bg-primary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            width: fit-content;
         }
     </style>
 </head>
@@ -175,56 +206,62 @@
 
 <div class="container">
     <header>
-        <h1>SAGE</h1>
-        <p class="subtitle">Sistema de Aprendizagem e Mapeamento Epistemológico Curricular</p>
+        <h1>SAGE - PATOLOGIA GERAL</h1>
+        <p class="subtitle">Plataforma Digital de Mapeamento Cognitivo e Conteúdo Acadêmico</p>
     </header>
 
     <div class="workspace">
         <div class="panel">
-            <h2 class="panel-title">Matriz de Dados (JSON)</h2>
+            <h2 class="panel-title">Estrutura de Entrada (JSON)</h2>
             <textarea id="json-input">[
   {
-    "id": "introducao_celular",
-    "nome": "Introdução à Citologia",
-    "desc": "Estudo da morfologia, organelas e estruturas básicas da célula viva.",
-    "requisitos": []
+    "id": "lesao_celular",
+    "nome": "Lesão Celular Reversível e Irreversível",
+    "desc": "Estudo dos mecanismos de agressão às células, estresse oxidativo e depleção de ATP.",
+    "requisitos": [],
+    "conteudo": "A lesão celular ocorre quando o estresse excede a capacidade de adaptação da célula. <ul><li><strong>Mecanismos:</strong> Depleção de ATP (falha nas bombas iônicas), dano mitocondrial, influxo de Cálcio intracelular (ativando enzimas líticas) e acúmulo de radicais livres (estresse oxidativo).</li><li><strong>Lesão Reversível:</strong> Caracteriza-se por tumefação celular (degeneração hidrópica) e alteração gordurosa (esteatose). A membrana continua íntegra.</li><li><strong>Lesão Irreversível:</strong> Ponto de não retorno biológico, marcado por dano grave às membranas plasmática e mitocondrial, além de dissolução nuclear.</li></ul>"
   },
   {
-    "id": "bioquimica_estrutural",
-    "nome": "Bioquímica Estrutural",
-    "desc": "Análise de macromoléculas, proteínas, lipídeos e carboidratos estruturais.",
-    "requisitos": []
+    "id": "necrose_apoptose",
+    "nome": "Morte Celular: Necrose e Apoptose",
+    "desc": "Análise dos padrões morfológicos de necrose e vias bioquímicas da apoptose.",
+    "requisitos": ["lesao_celular"],
+    "conteudo": "A morte celular é o desfecho da lesão irreversível, ocorrendo por dois caminhos distintos: <ul><li><strong>Necrose:</strong> Processo patológico, sempre associado à inflamação. Há digestão enzimática da célula e extravasamento do conteúdo citoplasmático. Padrões morfológicos incluem Necrose de Coagulação (isquemia/infarto), Liquefação (infecções bacterianas/SNC), Caseosa (Tuberculose) e Gordurosa (Pancreatite).</li><li><strong>Apoptose:</strong> Morte celular programada e regulada energeticamente (gasta ATP), sem quebra da membrana e sem gerar resposta inflamatória. Fagocitada por macrófagos através de sinais 'eat-me'.</li></ul>"
   },
   {
-    "id": "metabolismo_energetico",
-    "nome": "Metabolismo Energético",
-    "desc": "Cinética enzimática, Ciclo de Krebs e fosforilação oxidativa mitocondrial.",
-    "requisitos": ["bioquimica_estrutural", "introducao_celular"]
+    "id": "inflamacao_aguda",
+    "nome": "Inflamação Aguda e Resposta Vascular",
+    "desc": "Fenômenos vasculares, exsudação celular, mediadores químicos e o papel dos neutrófilos.",
+    "requisitos": ["lesao_celular"],
+    "conteudo": "Resposta imediata do tecido vivo a um agente agressor. <ul><li><strong>Eventos Vasculares:</strong> Vasodilatação arteriolar induzida por histamina (causando rubor e calor) e aumento da permeabilidade endotelial (gerando exsudato e edema).</li><li><strong>Eventos Celulares:</strong> Recrutamento de leucócitos (predominantemente neutrófilos nas primeiras 24-48 horas). Etapas: Marginação, Rolagem (Selectinas), Adesão Firme (Integrinas), Diapedese (Transmigração) e Quimiotaxia em direção ao foco lesivo.</li></ul>"
   },
   {
-    "id": "genetica_molecular",
-    "nome": "Genética Molecular",
-    "desc": "Mecanismos de replicação do DNA, transcrição, tradução e síntese proteica.",
-    "requisitos": ["introducao_celular"]
+    "id": "inflamacao_cronica",
+    "nome": "Inflamação Crônica e Granulomatosa",
+    "desc": "Persistência do agente agressor, infiltração celular mononuclear e fibrose.",
+    "requisitos": ["inflamacao_aguda"],
+    "conteudo": "Processo inflamatório de duração prolongada (semanas, meses ou anos) onde a destruição tecidual e a tentativa de reparo ocorrem simultaneamente. <ul><li><strong>Infiltrado Celular:</strong> Caracterizado por células mononucleares, principalmente Macrófagos, Linfócitos e Plasmócitos.</li><li><strong>Inflamação Granulomatosa:</strong> Padrão celular específico projetado para isolar agentes difíceis de erradicar (como <i>M. tuberculosis</i>). Forma-se o granuloma, composto por macrófagos modificados (células epitelioides) e células gigantes multinucleadas (Langhans).</li></ul>"
   },
   {
-    "id": "fisiologia_sistemica",
-    "nome": "Fisiologia Sistêmica",
-    "desc": "Integração dos sistemas orgânicos, regulação neuroendócrina e homeostase.",
-    "requisitos": ["metabolismo_energetico"]
+    "id": "reparo_tecidual",
+    "nome": "Reparo Tecidual: Regeneração e Cicatrização",
+    "desc": "Mecanismos de cura, deposição de colágeno, angiogênese e fibrosamento.",
+    "requisitos": ["inflamacao_aguda", "necrose_apoptose"],
+    "conteudo": "Restauração da arquitetura e função tecidual após uma lesão. <ul><li><strong>Regeneração:</strong> Proliferação de células remanescentes não lesadas. Ocorre em tecidos com alta capacidade mitótica (tecidos lábeis e estáveis, como o fígado).</li><li><strong>Cicatrização (Substituição por Fibrose):</strong> Ocorre se a matriz extracelular foi destruída ou em tecidos permanentes (como miocárdio e neurônios). Envolve Angiogênese (formação de novos vasos), migração e proliferação de fibroblastos, deposição de tecido de granulação e remodelação do colágeno.</li></ul>"
   },
   {
-    "id": "patologia_clinica",
-    "nome": "Patologia Clínica Diagnóstica",
-    "desc": "Mecanismos de lesão celular, resposta inflamatória e disfunções orgânicas.",
-    "requisitos": ["fisiologia_sistemica", "genetica_molecular"]
+    "id": "neoplasias",
+    "nome": "Oncologia Geral: Neoplasias Benignas e Malignas",
+    "desc": "Cinética tumoral, anaplasia, invasão tecidual, metástase e biologia molecular do câncer.",
+    "requisitos": ["reparo_tecidual", "inflamacao_cronica"],
+    "conteudo": "Massa anormal de tecido cujo crescimento excede e não está coordenado com o dos tecidos normais, persistindo mesmo após a cessação dos estímulos. <ul><li><strong>Benignas:</strong> Bem diferenciadas, crescimento lento, circunscritas (encapsuladas), sem capacidade de invasão local ou metástase.</li><li><strong>Malignas (Câncer):</strong> Variam de bem diferenciadas a indiferenciadas (Anaplasia), crescimento rápido, infiltram e destroem tecidos adjacentes e possuem capacidade de Metástase (disseminação hematogênica, linfática ou por cavidades).</li></ul>"
   }
 ]</textarea>
-            <button onclick="processarEmenta()">Compilar Trilha Cognitiva</button>
+            <button onclick="processarEmenta()">Remapear e Atualizar Trilha</button>
         </div>
 
         <div class="panel">
-            <h2 class="panel-title">Trilha Cronológica de Aprendizagem</h2>
+            <h2 class="panel-title">Trilha Cronológica de Aprendizagem e Estudo</h2>
             <div id="output" class="output-container">
                 </div>
         </div>
@@ -240,11 +277,10 @@ function processarEmenta() {
     try {
         dados = JSON.parse(document.getElementById('json-input').value);
     } catch (e) {
-        outputDiv.innerHTML = `<div style="color: #ff7b72; font-size: 13px;">Erro de Sintaxe: Certifique-se de que o JSON está formatado corretamente.</div>`;
+        outputDiv.innerHTML = `<div style="color: #ff7b72; font-size: 13px;">Erro de Sintaxe: Verifique a formatação do JSON.</div>`;
         return;
     }
 
-    // Criação das estruturas de dados para o Grafo
     const nos = {};
     const adjacencia = {};
     const grauEntrada = {};
@@ -255,7 +291,6 @@ function processarEmenta() {
         grauEntrada[item.id] = 0;
     });
 
-    // Mapeamento das arestas (dependências)
     dados.forEach(item => {
         item.requisitos.forEach(req => {
             if (adjacencia[req]) {
@@ -265,7 +300,6 @@ function processarEmenta() {
         });
     });
 
-    // Algoritmo de Kahn (Ordenação Topológica por Camadas)
     let fila = [];
     for (const id in grauEntrada) {
         if (grauEntrada[id] === 0) fila.push(id);
@@ -277,13 +311,12 @@ function processarEmenta() {
     while (fila.length > 0) {
         let proximaFila = [];
         
-        // Bloco HTML do estágio atual
         const estagioBloco = document.createElement('div');
         estagioBloco.className = 'estagio-bloco';
         
         const estagioHeader = document.createElement('div');
         estagioHeader.className = 'estagio-header';
-        estagioHeader.innerHTML = `<span>ESTÁGIO CRONOLÓGICO ${String(estagioNum).padStart(2, '0')}</span> <span class="badge">Nível ${estagioNum}</span>`;
+        estagioHeader.innerHTML = `<span>ESTÁGIO CRONOLÓGICO ${String(estagioNum).padStart(2, '0')}</span> <span class="badge">Nível de Proficiência ${estagioNum}</span>`;
         estagioBloco.appendChild(estagioHeader);
 
         fila.forEach(id => {
@@ -294,15 +327,16 @@ function processarEmenta() {
             card.className = 'card-topico';
             
             const reqsTxt = item.requisitos.length > 0 ? `Pré-requisitos: ${item.requisitos.join(', ').toUpperCase()}` : 'Conceito Base Introdutório';
+            const conteudoCorpo = item.conteudo ? item.conteudo : 'Conteúdo acadêmico não cadastrado para este tópico.';
             
             card.innerHTML = `
-                <div class="topico-title">${item.nome.toUpperCase()}</div>
+                <div class="topico-title">📘 ${item.nome.toUpperCase()}</div>
                 <div class="topico-desc">${item.desc}</div>
+                <div class="conteudo-academico">${conteudoCorpo}</div>
                 <div class="topico-meta">🔬 Correlação: ${reqsTxt}</div>
             `;
             estagioBloco.appendChild(card);
 
-            // Atualiza os graus de entrada dos nós vizinhos
             adjacencia[id].forEach(vizinho => {
                 grauEntrada[vizinho]--;
                 if (grauEntrada[vizinho] === 0) {
@@ -317,11 +351,10 @@ function processarEmenta() {
     }
 
     if (nosProcessados !== dados.length) {
-        outputDiv.innerHTML = `<div style="color: #ff7b72; font-size: 13px;">Erro Crítico: Detectada dependência cíclica infinita na ementa.</div>`;
+        outputDiv.innerHTML = `<div style="color: #ff7b72; font-size: 13px;">Erro Crítico: Detectada dependência cíclica na ementa.</div>`;
     }
 }
 
-// Execução inicial
 window.onload = processarEmenta;
 </script>
 </body>
