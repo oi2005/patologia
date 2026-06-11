@@ -14,6 +14,9 @@
             --accent: #58a6ff;
             --accent-success: #2ea44f;
             --content-bg: #1f242c;
+            --slide-bg: rgba(88, 166, 255, 0.05);
+            --check-bg: rgba(46, 164, 79, 0.05);
+            --accent-check: #3fb950;
         }
 
         body {
@@ -28,7 +31,7 @@
 
         .container {
             width: 100%;
-            max-width: 1100px;
+            max-width: 1200px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -56,11 +59,11 @@
 
         .workspace {
             display: grid;
-            grid-template-columns: 320px 1fr;
+            grid-template-columns: 300px 1fr;
             gap: 20px;
         }
 
-        @media (max-width: 850px) {
+        @media (max-width: 950px) {
             .workspace { grid-template-columns: 1fr; }
         }
 
@@ -148,46 +151,73 @@
         }
 
         .card-topico {
-            padding: 16px;
+            padding: 20px;
             border-bottom: 1px solid var(--border-color);
         }
 
         .card-topico:last-child { border-bottom: none; }
 
         .topico-title {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             color: #f0f6fc;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 4px;
         }
 
         .topico-desc {
             font-size: 13px;
             color: var(--text-muted);
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             font-style: italic;
+        }
+
+        .secao-bloco {
+            margin-bottom: 12px;
+            padding: 12px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.6;
         }
 
         .conteudo-academico {
             background-color: var(--content-bg);
             border-left: 3px solid var(--accent);
-            padding: 12px;
-            border-radius: 0 4px 4px 0;
-            font-size: 13px;
-            line-height: 1.6;
             color: #e6edf3;
-            margin-bottom: 12px;
         }
 
-        .conteudo-academico ul {
-            margin: 6px 0 0 0;
-            padding-left: 20px;
+        .slides-direcionamento {
+            background-color: var(--slide-bg);
+            border-left: 3px solid var(--accent);
+            color: #dbedf3;
         }
 
-        .conteudo-academico li {
+        .check-aprendizado {
+            background-color: var(--check-bg);
+            border-left: 3px solid var(--accent-check);
+            color: #edf3ed;
+        }
+
+        .secao-titulo {
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .conteudo-academico .secao-titulo { color: var(--accent); }
+        .slides-direcionamento .secao-titulo { color: #79c0ff; }
+        .check-aprendizado .secao-titulo { color: var(--accent-check); }
+
+        ul {
+            margin: 4px 0 0 0;
+            padding-left: 18px;
+        }
+
+        li {
             margin-bottom: 4px;
         }
 
@@ -199,6 +229,7 @@
             padding: 4px 8px;
             border-radius: 4px;
             width: fit-content;
+            margin-top: 14px;
         }
     </style>
 </head>
@@ -211,6 +242,7 @@
     </header>
 
     <div class="workspace">
+        <!-- PAINEL DE CONTROLE LATERAL -->
         <div class="panel">
             <h2 class="panel-title">Estrutura de Entrada (JSON)</h2>
             <textarea id="json-input">[
@@ -219,51 +251,65 @@
     "nome": "Lesão Celular Reversível e Irreversível",
     "desc": "Estudo dos mecanismos de agressão às células, estresse oxidativo e depleção de ATP.",
     "requisitos": [],
-    "conteudo": "A lesão celular ocorre quando o estresse excede a capacidade de adaptação da célula. <ul><li><strong>Mecanismos:</strong> Depleção de ATP (falha nas bombas iônicas), dano mitocondrial, influxo de Cálcio intracelular (ativando enzimas líticas) e acúmulo de radicais livres (estresse oxidativo).</li><li><strong>Lesão Reversível:</strong> Caracteriza-se por tumefação celular (degeneração hidrópica) e alteração gordurosa (esteatose). A membrana continua íntegra.</li><li><strong>Lesão Irreversível:</strong> Ponto de não retorno biológico, marcado por dano grave às membranas plasmática e mitocondrial, além de dissolução nuclear.</li></ul>"
+    "conteudo": "A lesão celular ocorre quando o estresse excede a capacidade de adaptação da célula. Envolve depleção de ATP, dano mitocondrial e influxo de Cálcio intracelular.",
+    "slides": "<ul><li><strong>Slide 1: Título e Homeostase</strong> (Conceito de equilíbrio celular e causas de estresse como hipóxia e agentes químicos).</li><li><strong>Slide 2: Lesão Reversível</strong> (Morfologia da Degeneração Hidrópica e Esteatose Hepática - focar em edema citoplasmático).</li><li><strong>Slide 3: Ultraestrutura e Ponto de Não Retorno</strong> (Esquema demonstrando o colapso mitocondrial e a ruptura de membranas lisossomais).</li></ul>",
+    "check": "<ul><li>Diferenciar com clareza uma alteração adaptativa de uma lesão celular ativa.</li><li>Explicar por que a falha da bomba de Na+/K+ ATPase causa tumefação celular (edema).</li><li>Identificar as principais características morfológicas microscópicas da esteatose.</li></ul>"
   },
   {
     "id": "necrose_apoptose",
     "nome": "Morte Celular: Necrose e Apoptose",
     "desc": "Análise dos padrões morfológicos de necrose e vias bioquímicas da apoptose.",
     "requisitos": ["lesao_celular"],
-    "conteudo": "A morte celular é o desfecho da lesão irreversível, ocorrendo por dois caminhos distintos: <ul><li><strong>Necrose:</strong> Processo patológico, sempre associado à inflamação. Há digestão enzimática da célula e extravasamento do conteúdo citoplasmático. Padrões morfológicos incluem Necrose de Coagulação (isquemia/infarto), Liquefação (infecções bacterianas/SNC), Caseosa (Tuberculose) e Gordurosa (Pancreatite).</li><li><strong>Apoptose:</strong> Morte celular programada e regulada energeticamente (gasta ATP), sem quebra da membrana e sem gerar resposta inflamatória. Fagocitada por macrófagos através de sinais 'eat-me'.</li></ul>"
+    "conteudo": "A morte celular é o desfecho da lesão irreversível. A necrose é sempre patológica e inflamatória, enquanto a apoptose é programada e silenciosa.",
+    "slides": "<ul><li><strong>Slide 1: Necrose vs Apoptose</strong> (Tabela comparativa: tamanho celular, integridade de membrana e inflamação).</li><li><strong>Slide 2: Padrões de Necrose</strong> (Imagens histológicas de Necrose de Coagulação no infarto, Liquefação no cérebro e Caseosa na tuberculose).</li><li><strong>Slide 3: Vias da Apoptose</strong> (Diagrama simplificado da via intrínseca mitocondrial/citocromo c e ativação de caspases executoras).</li></ul>",
+    "check": "<ul><li>Identificar macroscopicamente e microscopicamente a diferença entre necrose de coagulação e liquefação.</li><li>Definir cariólise, picnose e cariorréxe (padrões de destruição nuclear).</li><li>Explicar por que a apoptose não engaja uma resposta inflamatória tecidual.</li></ul>"
   },
   {
     "id": "inflamacao_aguda",
     "nome": "Inflamação Aguda e Resposta Vascular",
     "desc": "Fenômenos vasculares, exsudação celular, mediadores químicos e o papel dos neutrófilos.",
     "requisitos": ["lesao_celular"],
-    "conteudo": "Resposta imediata do tecido vivo a um agente agressor. <ul><li><strong>Eventos Vasculares:</strong> Vasodilatação arteriolar induzida por histamina (causando rubor e calor) e aumento da permeabilidade endotelial (gerando exsudato e edema).</li><li><strong>Eventos Celulares:</strong> Recrutamento de leucócitos (predominantemente neutrófilos nas primeiras 24-48 horas). Etapas: Marginação, Rolagem (Selectinas), Adesão Firme (Integrinas), Diapedese (Transmigração) e Quimiotaxia em direção ao foco lesivo.</li></ul>"
+    "conteudo": "Resposta imediata do tecido a uma agressão. Envolve vasodilatação arteriolar por histamina, aumento da permeabilidade vascular (edema) e recrutamento de neutrófilos.",
+    "slides": "<ul><li><strong>Slide 1: Sinais Cardinais</strong> (Rubor, calor, tumor, dor e perda de função explicados pela fisiologia vascular).</li><li><strong>Slide 2: Cascata de Recrutamento Leucocitário</strong> (Esquema visual mostrando as etapas de Marginação, Rolagem, Adesão Firme e Diapedese).</li><li><strong>Slide 3: Mediadores Químicos</strong> (Resumo do papel da Histamina, Bradicinina e metabólitos do Ácido Araquidônico - Prostaglandinas).</li></ul>",
+    "check": "<ul><li>Diferenciar Exsudato (rico em proteínas e leucócitos) de Transudato (ultrafiltrado plasmático hidrostático).</li><li>Listar a sequência cronológica exata das moléculas de adesão (Selectinas e Integrinas) envolvidas na migração do leucócito.</li></ul>"
   },
   {
     "id": "inflamacao_cronica",
     "nome": "Inflamação Crônica e Granulomatosa",
     "desc": "Persistência do agente agressor, infiltração celular mononuclear e fibrose.",
     "requisitos": ["inflamacao_aguda"],
-    "conteudo": "Processo inflamatório de duração prolongada (semanas, meses ou anos) onde a destruição tecidual e a tentativa de reparo ocorrem simultaneamente. <ul><li><strong>Infiltrado Celular:</strong> Caracterizado por células mononucleares, principalmente Macrófagos, Linfócitos e Plasmócitos.</li><li><strong>Inflamação Granulomatosa:</strong> Padrão celular específico projetado para isolar agentes difíceis de erradicar (como <i>M. tuberculosis</i>). Forma-se o granuloma, composto por macrófagos modificados (células epitelioides) e células gigantes multinucleadas (Langhans).</li></ul>"
+    "conteudo": "Inflamação de duração prolongada onde destruição tecidual, infiltração mononuclear (macrófagos e linfócitos) e tentativas de reparo ocorrem em paralelo.",
+    "slides": "<ul><li><strong>Slide 1: Características Gerais</strong> (Comparativo celular com a fase aguda e causas da cronicidade).</li><li><strong>Slide 2: O Macrófago Ativado</strong> (O papel central da célula M1 e M2 na destruição e na sinalização de reparo).</li><li><strong>Slide 3: Morfologia do Granuloma</strong> (Lâmina histológica evidenciando coroa de linfócitos, células epitelioides e Células Gigantes Multinucleadas tipo Langhans).</li></ul>",
+    "check": "<ul><li>Reconhecer o arranjo arquitetural de um granuloma caseoso e associá-lo à infecção por tuberculose.</li><li>Explicar a cooperação imunológica fundamental entre linfócitos T e macrófagos (via IFN-gama).</li></ul>"
   },
   {
     "id": "reparo_tecidual",
     "nome": "Reparo Tecidual: Regeneração e Cicatrização",
     "desc": "Mecanismos de cura, deposição de colágeno, angiogênese e fibrosamento.",
     "requisitos": ["inflamacao_aguda", "necrose_apoptose"],
-    "conteudo": "Restauração da arquitetura e função tecidual após uma lesão. <ul><li><strong>Regeneração:</strong> Proliferação de células remanescentes não lesadas. Ocorre em tecidos com alta capacidade mitótica (tecidos lábeis e estáveis, como o fígado).</li><li><strong>Cicatrização (Substituição por Fibrose):</strong> Ocorre se a matriz extracelular foi destruída ou em tecidos permanentes (como miocárdio e neurônios). Envolve Angiogênese (formação de novos vasos), migração e proliferação de fibroblastos, deposição de tecido de granulação e remodelação do colágeno.</li></ul>"
+    "conteudo": "Restauração da integridade tecidual. Tecidos lábeis/estáveis regeneram; lesões profundas ou tecidos permanentes (miocárdio) reparam por cicatrização.",
+    "slides": "<ul><li><strong>Slide 1: Capacidade Proliferativa</strong> (Classificação dos tecidos em Lábeis, Estáveis e Permanentes).</li><li><strong>Slide 2: Tecido de Granulação</strong> (Histologia rica em capilares neoformados, fibroblastos ativos e matriz extracelular frouxa).</li><li><strong>Slide 3: Cicatrização por 1ª e 2ª Intenção</strong> (Esquema comparativo demonstrando a perda de tecido, força tênsil e fechamento da ferida).</li></ul>",
+    "check": "<ul><li>Descrever as 3 etapas da Angiogênese (brotamento vascular a partir de vasos preexistentes).</li><li>Explicar os fatores sistêmicos e locais que podem atrasar a cicatrização (ex: Diabetes, Glicocorticoides, Infecção local).</li></ul>"
   },
   {
     "id": "neoplasias",
     "nome": "Oncologia Geral: Neoplasias Benignas e Malignas",
     "desc": "Cinética tumoral, anaplasia, invasão tecidual, metástase e biologia molecular do câncer.",
     "requisitos": ["reparo_tecidual", "inflamacao_cronica"],
-    "conteudo": "Massa anormal de tecido cujo crescimento excede e não está coordenado com o dos tecidos normais, persistindo mesmo após a cessação dos estímulos. <ul><li><strong>Benignas:</strong> Bem diferenciadas, crescimento lento, circunscritas (encapsuladas), sem capacidade de invasão local ou metástase.</li><li><strong>Malignas (Câncer):</strong> Variam de bem diferenciadas a indiferenciadas (Anaplasia), crescimento rápido, infiltram e destroem tecidos adjacentes e possuem capacidade de Metástase (disseminação hematogênica, linfática ou por cavidades).</li></ul>"
+    "conteudo": "Crescimento tecidual autônomo, desregulado e clonal que persiste mesmo após a retirada do estímulo causador.",
+    "slides": "<ul><li><strong>Slide 1: Nomenclatura e Classificação</strong> (Regras de sufixos como -oma, carcinoma e sarcoma com exemplos práticos).</li><li><strong>Slide 2: Benigno vs Maligno</strong> (Lâminas comparando diferenciação celular, mitoses atípicas, capsulação e invasão de vasos).</li><li><strong>Slide 3: Vias de Metástase</strong> (Mapeamento das rotas de disseminação: Linfática, Hematogênica e por Semeadura em cavidades).</li></ul>",
+    "check": "<ul><li>Definir Anaplasia e correlacioná-la com o grau de agressividade histológica do tumor.</li><li>Explicar a diferença conceitual e biológica estrutural entre um Adenoma e um Adenocarcinoma.</li><li>Listar as principais marcas biológicas do câncer (autossuficiência em sinais de crescimento, evasão da apoptose).</li></ul>"
   }
 ]</textarea>
             <button onclick="processarEmenta()">Remapear e Atualizar Trilha</button>
         </div>
 
+        <!-- PAINEL DA TRILHA DE CONTEÚDO -->
         <div class="panel">
             <h2 class="panel-title">Trilha Cronológica de Aprendizagem e Estudo</h2>
             <div id="output" class="output-container">
-                </div>
+                <!-- Conteúdos gerados dinamicamente via JS -->
+            </div>
         </div>
     </div>
 </div>
@@ -327,13 +373,30 @@ function processarEmenta() {
             card.className = 'card-topico';
             
             const reqsTxt = item.requisitos.length > 0 ? `Pré-requisitos: ${item.requisitos.join(', ').toUpperCase()}` : 'Conceito Base Introdutório';
-            const conteudoCorpo = item.conteudo ? item.conteudo : 'Conteúdo acadêmico não cadastrado para este tópico.';
+            const conteudoCorpo = item.conteudo ? item.conteudo : 'Resumo não cadastrado.';
+            const slidesCorpo = item.slides ? item.slides : 'Direcionamento de slides não cadastrado.';
+            const checkCorpo = item.check ? item.check : 'Metas de retenção não cadastradas.';
             
             card.innerHTML = `
                 <div class="topico-title">📘 ${item.nome.toUpperCase()}</div>
                 <div class="topico-desc">${item.desc}</div>
-                <div class="conteudo-academico">${conteudoCorpo}</div>
-                <div class="topico-meta">🔬 Correlação: ${reqsTxt}</div>
+                
+                <div class="secao-bloco conteudo-academico">
+                    <div class="secao-titulo">🔬 Resumo Patológico Fundamental</div>
+                    <div>${conteudoCorpo}</div>
+                </div>
+
+                <div class="secao-bloco slides-direcionamento">
+                    <div class="secao-titulo">🗺️ Mapeamento e Roteiro de Slides</div>
+                    <div>${slidesCorpo}</div>
+                </div>
+
+                <div class="secao-bloco check-aprendizado">
+                    <div class="secao-titulo">🎯 Checklist de Retenção (O que você DEVE dominar)</div>
+                    <div>${checkCorpo}</div>
+                </div>
+
+                <div class="topico-meta">⛓️ Correlação Curricular: ${reqsTxt}</div>
             `;
             estagioBloco.appendChild(card);
 
