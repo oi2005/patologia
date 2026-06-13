@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Traços do Amor - Conexão Infinita</title>
+    <title>Traços do Amor - Realtime ❤️</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         :root {
             --cor-fundo: #fff0f3;
@@ -32,6 +34,41 @@
             padding: 15px;
         }
 
+        /* TELA DE LOBBY / CONEXÃO */
+        .tela-lobby {
+            background: var(--cor-painel);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.15);
+            border: 2px solid var(--cor-borda);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .lobby-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-lobby {
+            padding: 12px;
+            border: 2px solid var(--cor-borda);
+            border-radius: 10px;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+        }
+
+        .input-lobby:focus {
+            border-color: var(--cor-principal);
+        }
+
+        /* ESTRUTURA PRINCIPAL DO JOGO */
         .jogo-container {
             background: var(--cor-painel);
             width: 100%;
@@ -43,9 +80,9 @@
             grid-template-columns: 340px 1fr;
             overflow: hidden;
             height: 700px;
+            display: none; /* Oculto até conectar */
         }
 
-        /* PAINEL LATERAL (Status, Fluxo e Diálogo) */
         .painel-lateral {
             border-right: 2px solid var(--cor-borda);
             background: var(--cor-fundo-claro);
@@ -65,7 +102,6 @@
             color: var(--cor-principal);
             font-size: 1.6rem;
             font-weight: 800;
-            letter-spacing: -0.5px;
         }
 
         .rodada-status {
@@ -85,13 +121,11 @@
             border-radius: 16px;
             padding: 18px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(255, 77, 109, 0.04);
         }
 
         .caixa-contexto h3 {
             font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
             color: var(--cor-secundaria);
             margin-bottom: 8px;
         }
@@ -99,7 +133,6 @@
         .caixa-contexto p {
             font-size: 1.1rem;
             font-weight: 600;
-            line-height: 1.4;
         }
 
         .painel-dialogo {
@@ -109,16 +142,12 @@
             font-size: 0.95rem;
             line-height: 1.5;
             border-left: 5px solid var(--cor-principal);
-            margin-bottom: 20px;
         }
 
         .painel-dialogo strong {
             color: var(--cor-principal);
             display: block;
             margin-bottom: 5px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .btn {
@@ -133,23 +162,21 @@
             width: 100%;
             font-size: 1rem;
             box-shadow: 0 4px 12px rgba(255, 77, 109, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
 
         .btn:hover {
             background: #ff2a55;
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(255, 77, 109, 0.3);
         }
 
-        .btn:active {
-            transform: translateY(0);
+        .btn:disabled {
+            background: #ccb3b7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
-        /* ÁREA CENTRAL DE JOGO (Gartic Phone Style) */
+        /* ÁREAS DE CONTEÚDO */
         .area-central {
             display: flex;
             flex-direction: column;
@@ -162,24 +189,16 @@
             font-size: 1.2rem;
             font-weight: 700;
             margin-bottom: 15px;
-            color: var(--cor-texto);
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
-        /* Tela de Escrita Secreta */
-        .tela-escrita {
+        /* Telas de Estados */
+        .tela-fase {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             gap: 20px;
-            background: var(--cor-fundo-claro);
-            border: 3px dashed var(--cor-borda);
-            border-radius: 18px;
-            padding: 40px;
             text-align: center;
         }
 
@@ -191,22 +210,7 @@
             border-radius: 12px;
             font-size: 1.1rem;
             outline: none;
-            color: var(--cor-texto);
-            transition: border-color 0.2s;
             text-align: center;
-        }
-
-        .input-frase:focus {
-            border-color: var(--cor-principal);
-            box-shadow: 0 0 0 4px rgba(255, 77, 109, 0.1);
-        }
-
-        /* Tela de Desenho */
-        .tela-desenho {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            display: none; /* Controlado via JS */
         }
 
         canvas {
@@ -216,6 +220,7 @@
             cursor: crosshair;
             flex-grow: 1;
             box-shadow: inset 0 4px 12px rgba(0,0,0,0.03);
+            width: 100%;
         }
 
         .barra-ferramentas {
@@ -226,7 +231,7 @@
             padding: 12px 20px;
             background: var(--cor-fundo-claro);
             border-radius: 14px;
-            border: 1px solid var(--cor-borda);
+            width: 100%;
         }
 
         .cores {
@@ -241,16 +246,11 @@
             cursor: pointer;
             border: 2.5px solid white;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-            transition: transform 0.15s ease;
-        }
-
-        .cor-opcao:hover {
-            transform: scale(1.2);
         }
 
         .cor-opcao.selecionada {
             border-color: var(--cor-texto);
-            transform: scale(1.15);
+            transform: scale(1.1);
         }
 
         .btn-limpar {
@@ -261,50 +261,7 @@
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.9rem;
             margin-left: auto;
-            transition: background 0.2s;
-        }
-
-        .btn-limpar:hover {
-            background: #3d5a80;
-        }
-
-        /* Tela de Transição / Passar o Aparelho */
-        .tela-transicao {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--cor-texto);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            z-index: 10;
-            padding: 30px;
-            text-align: center;
-            display: none; /* Controlado via JS */
-        }
-
-        .tela-transicao h2 {
-            font-size: 2.2rem;
-            color: var(--cor-secundaria);
-        }
-
-        /* Tela de Revelação Final */
-        .tela-revelacao {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            text-align: center;
-            display: none;
         }
 
         .preview-desenho {
@@ -313,7 +270,6 @@
             border: 3px solid var(--cor-borda);
             border-radius: 18px;
             background: white;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
         }
 
         .comparacao {
@@ -345,109 +301,97 @@
             font-weight: bold;
         }
 
-        /* Responsividade */
         @media (max-width: 850px) {
-            .jogo-container {
-                grid-template-columns: 1fr;
-                height: auto;
-            }
-            .painel-lateral {
-                border-right: none;
-                border-bottom: 2px solid var(--cor-borda);
-                height: auto;
-            }
-            canvas {
-                height: 350px;
-            }
+            .jogo-container { grid-template-columns: 1fr; height: auto; }
+            .painel-lateral { border-right: none; border-bottom: 2px solid var(--cor-borda); }
+            canvas { height: 350px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="jogo-container">
+    <div class="tela-lobby" id="lobby-conexao">
+        <h2 style="color: var(--cor-principal);">Traços do Amor 🛰️</h2>
+        <p>Escolha como deseja se conectar com o seu par para jogarem em tempo real:</p>
         
-        <!-- PAINEL LATERAL ESQUERDO (Acompanha toda a experiência) -->
+        <button class="btn" onclick="criarSala()">Criar Nova Sala ✨</button>
+        
+        <div style="margin: 10px 0; font-weight: bold; opacity: 0.5;">OU</div>
+        
+        <div class="lobby-inputs">
+            <input type="text" id="input-codigo-sala" class="input-lobby" placeholder="Código da Sala (Ex: 4732)">
+            <button class="btn" style="background: #2a9d8f;" onclick="entrarSala()">Entrar na Sala do Meu Amor 🔑</button>
+        </div>
+    </div>
+
+    <div class="jogo-container" id="container-principal-jogo">
+        
         <div class="painel-lateral">
             <div class="cabecalho-jogo">
                 <h2 class="titulo-jogo">Traços do Amor</h2>
-                <div class="rodada-status" id="label-rodada">Fase de Inspiração</div>
+                <div class="rodada-status" id="label-rodada">Conectado</div>
+                <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;" id="exibicao-sala-id">Sala: ----</div>
             </div>
 
             <div>
-                <div class="caixa-contexto" id="container-tema">
-                    <h3>Tema Inspirador</h3>
-                    <p id="texto-tema">Carregando história de amor...</p>
+                <div class="caixa-contexto">
+                    <h3>Tema da Rodada</h3>
+                    <p id="texto-tema">Aguardando início...</p>
                 </div>
 
-                <div class="painel-dialogo" id="container-dialogo">
+                <div class="painel-dialogo">
                     <strong>Gatilho de Conversa 💬</strong>
-                    <span id="texto-dialogo">Aproveitem este momento inicial para alinhar os corações. Quem aqui tem a melhor memória sobre o início de tudo?</span>
+                    <span id="texto-dialogo">Conectando sintonia...</span>
                 </div>
             </div>
 
-            <button class="btn" id="btn-acao-principal" onclick="avancarFluxo()">
-                Começar Rodada ✨
+            <button class="btn" id="btn-acao-principal" disabled>
+                Aguardando Jogador...
             </button>
         </div>
 
-        <!-- ÁREA CENTRAL DE INTERAÇÃO -->
         <div class="area-central">
             
-            <!-- TELA DE TRANSIÇÃO (Passar o dispositivo em segredo) -->
-            <div class="tela-transicao" id="tela-transicao">
-                <h2>Passa o Aparelho! 🔄</h2>
-                <p id="texto-transicao">Agora é a vez do seu par. Não vale olhar a tela antes que ela mude!</p>
-                <button class="btn" style="max-width: 250px; background: white; color: var(--cor-texto);" onclick="confirmarTrocaParceiro()">
-                    Já mudei de mãos! 👋
-                </button>
+            <div class="tela-fase" id="fase-espera" style="display: none;">
+                <h2 style="font-size: 2rem;">Sintonia em Andamento... ⏳</h2>
+                <p id="texto-espera">Seu par está tomando uma ação importante agora. Aproveite para puxar assunto!</p>
             </div>
 
-            <!-- PASSO 1: ESCRITA SECRETA -->
-            <div class="tela-escrita" id="visual-escrita">
-                <div class="instrucao-passo">✍️ Defina o seu Momento Secreto</div>
-                <p style="color: var(--cor-texto); opacity: 0.8; font-size: 0.95rem;">Com base no tema ao lado, escreva uma frase curta que descreva exatamente a memória ou detalhe que você quer que seu amor desenhe.</p>
-                <input type="text" class="input-frase" id="campo-frase-secreta" placeholder="Ex: O dia em que tomamos chuva na praça..." autocomplete="off">
+            <div class="tela-fase" id="fase-escrita" style="display: none;">
+                <div class="instrucao-passo">✍️ Escreva o seu Momento Secreto</div>
+                <p>Baseado no tema ao lado, crie a descrição exata que seu amor terá que desenhar.</p>
+                <input type="text" id="campo-frase-secreta" class="input-frase" placeholder="Ex: O dia em que dividimos o mesmo casaco na chuva..." autocomplete="off">
             </div>
 
-            <!-- PASSO 2: DESENHO (Estilo Gartic clássico e direto) -->
-            <div class="tela-desenho" id="visual-desenho">
-                <div class="instrucao-passo">🎨 Hora de Desenhar!</div>
-                
+            <div class="tela-fase" id="fase-desenho" style="display: none; width: 100%; height: 100%;">
+                <div class="instrucao-passo">🎨 Sua vez de Desenhar!</div>
                 <canvas id="lousa-amor"></canvas>
-
                 <div class="barra-ferramentas">
                     <div class="cores">
                         <div class="cor-opcao selecionada" style="background: #ff4d6d;" onclick="mudarCor('#ff4d6d', this)"></div>
                         <div class="cor-opcao" style="background: #ff758f;" onclick="mudarCor('#ff758f', this)"></div>
                         <div class="cor-opcao" style="background: #590d22;" onclick="mudarCor('#590d22', this)"></div>
                         <div class="cor-opcao" style="background: #0077b6;" onclick="mudarCor('#0077b6', this)"></div>
-                        <div class="cor-opcao" style="background: #00b4d8;" onclick="mudarCor('#00b4d8', this)"></div>
                         <div class="cor-opcao" style="background: #ffb703;" onclick="mudarCor('#ffb703', this)"></div>
-                        <div class="cor-opcao" style="background: #2a9d8f;" onclick="mudarCor('#2a9d8f', this)"></div>
                         <div class="cor-opcao" style="background: #000000;" onclick="mudarCor('#000000', this)"></div>
                     </div>
-                    
-                    <button class="btn-limpar" onclick="limparLousa()">Limpar Tela 🗑️</button>
+                    <button class="btn-limpar" onclick="limparLousa()">Limpar 🗑️</button>
                 </div>
             </div>
 
-            <!-- PASSO 3: REVELAÇÃO E DIÁLOGO FINAL -->
-            <div class="tela-revelacao" id="visual-revelacao">
-                <div class="instrucao-passo">❤️ Olha o resultado!</div>
-                
-                <img id="imagem-resultado" class="preview-desenho" alt="Desenho de Amor">
-
+            <div class="tela-fase" id="fase-revelacao" style="display: none;">
+                <div class="instrucao-passo">❤️ Nossa Recordação Completa!</div>
+                <img id="imagem-resultado" class="preview-desenho" alt="Obra de Arte Romântica">
                 <div class="comparacao">
                     <div class="bloco-revelacao">
-                        <span>O que foi pedido:</span>
+                        <span>Tema Proposto:</span>
                         <p id="revelacao-pedido">-</p>
                     </div>
                     <div class="bloco-revelacao">
-                        <span>A frase secreta era:</span>
+                        <span>A Frase Oculta era:</span>
                         <p id="revelacao-secreta">-</p>
                     </div>
                 </div>
-                <p style="font-size: 0.95rem; max-width: 500px; font-style: italic; opacity: 0.9;">Conversem sobre o desenho! Ficou parecido? O que passou na cabeça de vocês nessa lembrança?</p>
             </div>
 
         </div>
@@ -455,160 +399,212 @@
     </div>
 
     <script>
-        // --- BANCO DE DADOS DINÂMICO, EXPANSIVO E NÃO REPETITIVO ---
-        const bancoTemasEstrategicos = [
-            {
-                tema: "O Nosso Começo Absoluto",
-                dialogo: "Enquanto escreve, comente: Qual detalhe bobo do dia em que nos conhecemos você lembra e acha que o outro já esqueceu?"
-            },
-            {
-                tema: "O Primeiro Beijo",
-                dialogo: "Converse com o parceiro: O que causou mais frio na barriga antes de acontecer? O ambiente, o som ao redor, ou o medo de dar errado?"
-            },
-            {
-                tema: "Uma Viagem ou Passeio Inesquecível",
-                dialogo: "Relembrem juntos: Qual foi o momento de perrengue ou a risada mais descontrolada que demos durante esse dia específico?"
-            },
-            {
-                tema: "Nossa Rotina Perfeita de Domingo",
-                dialogo: "Pensem alto: Se pudéssemos congelar um único domingo preguiçoso que passamos colados, qual domingo seria e por quê?"
-            },
-            {
-                tema: "A Comida que Une Nossos Corações",
-                dialogo: "Momento gula: Qual prato ou delivery se transformou na nossa marca registrada oficial de quando queremos celebrar?"
-            },
-            {
-                tema: "O Futuro Que Estamos Construindo",
-                dialogo: "Sonhando acordados: Como você imagina os detalhes físicos da sala de estar ou do quintal da nossa casa daqui a alguns anos?"
-            },
-            {
-                tema: "Um Presente ou Gesto Marcante",
-                dialogo: "Sensibilidade: Além do objeto material, qual foi a sensação de perceber o cuidado e o tempo que o outro gastou para te agradar?"
-            },
-            {
-                tema: "Uma Mania Engraçada Minha Que Você Ama",
-                dialogo: "Risadas: Qual tique, expressão ou mania fofa o outro faz sem perceber quando está concentrado ou com vergonha?"
-            },
-            {
-                tema: "O Dia em Que Eu Te Achei Irresistível",
-                dialogo: "Confissão direta: Detalhe o visual, a roupa ou o jeito que o parceiro agiu naquele dia que fez seu coração errar a batida."
-            },
-            {
-                tema: "O Nosso Filme, Série ou Trilha Sonora",
-                dialogo: "Cultura a dois: Que história fictícia ou música parece ter sido escrita perfeitamente para traduzir a nossa jornada?"
-            },
-            {
-                tema: "Um Apelido Carinhoso ou Piada Interna",
-                dialogo: "Cumplicidade: Como surgiu aquela palavra boba que só nós dois entendemos e que faz a gente rir no meio do público?"
-            },
-            {
-                tema: "Um Momento em que Fomos um Time Forte",
-                dialogo: "Superação: Relembrem um dia em que apoiamos um ao outro em uma dificuldade. Como isso nos deixou ainda mais inseparáveis?"
-            }
+        // --- BANCO DE DADOS DE TEMAS NÃO REPETITIVOS ---
+        const bancoTemas = [
+            { tema: "O Nosso Começo Absoluto", dialogo: "Qual detalhe bobo do dia em que nos conhecemos você lembra e acha que o outro já esqueceu?" },
+            { tema: "O Primeiro Beijo", dialogo: "O que causou mais frio na barriga antes de acontecer? O ambiente ou o medo do timing dar errado?" },
+            { tema: "Uma Viagem ou Passeio Inesquecível", dialogo: "Qual foi o perrengue mais engraçado ou a risada mais descontrolada desse dia?" },
+            { tema: "Nossa Rotina Perfeita de Domingo", dialogo: "Se pudéssemos congelar um único domingo preguiçoso que passamos colados, qual seria?" },
+            { tema: "A Comida que Une Nossos Corações", dialogo: "Qual prato ou delivery se transformou na nossa marca registrada oficial?" },
+            { tema: "O Futuro Que Estamos Construindo", dialogo: "Como você imagina os mínimos detalhes da nossa sala ou quintal daqui a alguns anos?" },
+            { tema: "Um Presente ou Gesto Marcante", dialogo: "Qual foi a sensação exata de perceber o cuidado que o outro gastou para te ver sorrir?" },
+            { tema: "O Dia em Que Eu Te Achei Irresistível", dialogo: "Confissão direta: Detalhe o visual ou o jeito que o parceiro agiu que te deixou sem chão." }
         ];
 
-        // Controle de Estado do Jogo (Gartic Phone Flow)
-        let filaDeTemas = [];
-        let temaAtual = null;
-        let estadoAtual = "INICIO"; // Estados: INICIO, ESCRITA, TRANSAO_DESENHO, DESENHO, REVELACAO
-        let fraseSalva = "";
+        // --- CONFIGURAÇÃO PÚBLICA DO FIREBASE REALTIME ---
+        const firebaseConfig = {
+            databaseURL: "https://tracosdoamor-default-rtdb.firebaseio.com/" 
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
 
-        // Inicialização do Sistema de Desenho
+        // Variáveis Globais de Estado Realtime
+        let ID_SALA = "";
+        let MEU_PAPEL = ""; // "CRIADOR" ou "CONVIDADO"
+        let estadoSalaRef = null;
+
+        // Elementos de Interface
+        const lobbyConexao = document.getElementById('lobby-conexao');
+        const containerJogo = document.getElementById('container-principal-jogo');
+        const btnAcao = document.getElementById('btn-acao-principal');
+
+        // Lousa de Desenho
         const canvas = document.getElementById('lousa-amor');
         const ctx = canvas.getContext('2d');
         let desenhando = false;
         let corAtual = '#ff4d6d';
 
-        // Carrega e embaralha os temas para nunca repetir até esgotar o banco
-        function inicializarTemas() {
-            if (filaDeTemas.length === 0) {
-                filaDeTemas = [...bancoTemasEstrategicos];
-                // Algoritmo Fisher-Yates para embaralhamento real
-                for (let i = filaDeTemas.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [filaDeTemas[i], filaDeTemas[j]] = [filaDeTemas[j], filaDeTemas[i]];
+        // --- CONEXÃO E GERENCIAMENTO DE SALAS ---
+        function criarSala() {
+            ID_SALA = Math.floor(1000 + Math.random() * 9000).toString();
+            MEU_PAPEL = "CRIADOR";
+            
+            // Sorteia tema inicial
+            const indiceAleatorio = Math.floor(Math.random() * bancoTemas.length);
+
+            estadoSalaRef = database.ref('salas/' + ID_SALA);
+            estadoSalaRef.set({
+                status: "AGUARDANDO_PAR",
+                temaIndice: indiceAleatorio,
+                fraseSecreta: "",
+                desenhoBase64: "",
+                rodadaContador: 1
+            });
+
+            configurarListenersSala();
+            abrirInterfaceJogo();
+        }
+
+        function entrarSala() {
+            const campoCodigo = document.getElementById('input-codigo-sala').value.trim();
+            if(!campoCodigo) return alert("Digite o código gerado pelo seu par!");
+
+            ID_SALA = campoCodigo;
+            MEU_PAPEL = "CONVIDADO";
+            estadoSalaRef = database.ref('salas/' + ID_SALA);
+
+            estadoSalaRef.once('value', (snapshot) => {
+                if(!snapshot.exists()) {
+                    alert("Sala não encontrada! Verifique o número com o seu amor.");
+                } else {
+                    estadoSalaRef.update({ status: "PRONTO_PARA_INICIAR" });
+                    configurarListenersSala();
+                    abrirInterfaceJogo();
                 }
-            }
-            temaAtual = filaDeTemas.pop();
+            });
         }
 
-        // Controlador de Fluxo Central do Jogo
-        function avancarFluxo() {
-            const visualEscrita = document.getElementById('visual-escrita');
-            const visualDesenho = document.getElementById('visual-desenho');
-            const visualRevelacao = document.getElementById('visual-revelacao');
-            const btnAcao = document.getElementById('btn-acao-principal');
-            const labelRodada = document.getElementById('label-rodada');
-            const campoFrase = document.getElementById('campo-frase-secreta');
+        function abrirInterfaceJogo() {
+            lobbyConexao.style.display = "none";
+            containerJogo.style.display = "grid";
+            document.getElementById('exibicao-sala-id').innerText = "Sala: " + ID_SALA;
+        }
 
-            if (estadoAtual === "INICIO") {
-                // Prepara nova rodada
-                inicializarTemas();
-                document.getElementById('texto-tema').innerText = temaAtual.tema;
-                document.getElementById('texto-dialogo').innerText = temaAtual.dialogo;
-                
-                // Vai para escrita
-                visualEscrita.style.display = "flex";
-                visualDesenho.style.display = "none";
-                visualRevelacao.style.display = "none";
-                
-                labelRodada.innerText = "Passo 1: Descrição Secreta";
-                btnAcao.innerText = "Travar Frase e Passar 🔒";
-                estadoAtual = "ESCRITA";
+        // --- CONTROLE DE FLUXO EM TEMPO REAL ---
+        function configurarListenersSala() {
+            estadoSalaRef.on('value', (snapshot) => {
+                const dados = snapshot.val();
+                if (!dados) return;
 
-            } else if (estadoAtual === "ESCRITA") {
-                fraseSalva = campoFrase.value.trim();
-                if (!fraseSalva) {
-                    alert("Por favor, digite uma frase romântica ou momento antes de continuar!");
-                    return;
+                const temaInfo = bancoTemas[dados.temaIndice];
+                document.getElementById('texto-tema').innerText = temaInfo.tema;
+                document.getElementById('texto-dialogo').innerText = temaInfo.dialogo;
+
+                // Máquina de Estados Baseada no Firebase
+                switch(dados.status) {
+                    case "AGUARDANDO_PAR":
+                        renderizarTelaEspera("Esperando seu amor entrar... 👋", "Compartilhe o código " + ID_SALA + " com ele(a) para começarem!");
+                        configurarBotaoLateral("Aguardando Conexão...", true);
+                        break;
+
+                    case "PRONTO_PARA_INICIAR":
+                        if(MEU_PAPEL === "CRIADOR") {
+                            renderizarTelaEspera("Par Conectado! ❤️", "Vocês já podem começar. Clique no botão abaixo para definir o primeiro desafio.");
+                            configurarBotaoLateral("Iniciar Partida ✨", false, () => {
+                                estadoSalaRef.update({ status: "FASE_ESCRITA" });
+                            });
+                        } else {
+                            renderizarTelaEspera("Sintonia Pronta! 🥰", "Aguardando o criador dar o pontapé inicial na rodada...");
+                            configurarBotaoLateral("Esperando Líder...", true);
+                        }
+                        break;
+
+                    case "FASE_ESCRITA":
+                        // O Criador escreve a frase secreta, o Convidado aguarda em segredo
+                        if(MEU_PAPEL === "CRIADOR") {
+                            mostrarApenasSubtela("fase-escrita");
+                            document.getElementById('label-rodada').innerText = "Passo 1: Seu Segredo";
+                            configurarBotaoLateral("Enviar Frase Oculta 🔒", false, EnviarFraseSecreta);
+                        } else {
+                            renderizarTelaEspera("Seu par está pensando... 🤔", "Ele está digitando uma memória secreta baseada no tema ao lado. Prepare o coração!");
+                            configurarBotaoLateral("Eles estão escrevendo...", true);
+                        }
+                        break;
+
+                    case "FASE_DESENHO":
+                        // O Convidado desenha o que foi pedido, o Criador aguarda ansioso
+                        if(MEU_PAPEL === "CONVIDADO") {
+                            mostrarApenasSubtela("fase-desenho");
+                            document.getElementById('label-rodada').innerText = "Passo 2: Hora de Desenhar";
+                            redimensionarCanvas();
+                            configurarBotaoLateral("Enviar Obra de Arte 🎨", false, EnviarDesenhoFinal);
+                        } else {
+                            renderizarTelaEspera("Seu amor está desenhando! 🎨", "Agora ele está transformando aquela memória em traços reais na tela dele. Aguarde o resultado!");
+                            configurarBotaoLateral("Eles estão desenhando...", true);
+                        }
+                        break;
+
+                    case "FASE_REVELACAO":
+                        document.getElementById('imagem-resultado').src = dados.desenhoBase64;
+                        document.getElementById('revelacao-pedido').innerText = temaInfo.tema;
+                        document.getElementById('revelacao-secreta').innerText = dados.fraseSecreta;
+                        
+                        mostrarApenasSubtela("fase-revelacao");
+                        document.getElementById('label-rodada').innerText = "Passo 3: Revelação";
+
+                        // Qualquer um pode reiniciar, reiniciando o loop trocando os papéis
+                        configurarBotaoLateral("Nova Rodada Alternada 🔄", false, () => {
+                            const novoIndiceTema = Math.floor(Math.random() * bancoTemas.length);
+                            // Inverte os papéis na próxima rodada para dinamismo total
+                            MEU_PAPEL = (MEU_PAPEL === "CRIADOR") ? "CONVIDADO" : "CRIADOR";
+                            
+                            estadoSalaRef.update({
+                                status: "FASE_ESCRITA",
+                                temaIndice: novoIndiceTema,
+                                fraseSecreta: "",
+                                desenhoBase64: ""
+                            });
+                        });
+                        break;
                 }
-
-                // Aciona a cortina de transição estilo Gartic Phone
-                document.getElementById('tela-transicao').style.display = "flex";
-                estadoAtual = "TRANSICAO_DESENHO";
-
-            } else if (estadoAtual === "DESENHO") {
-                // Finaliza o desenho, gera imagem estática e vai para Revelação
-                const imagemData = canvas.toDataURL();
-                document.getElementById('imagem-resultado').src = imagemData;
-                
-                document.getElementById('revelacao-pedido').innerText = temaAtual.tema;
-                document.getElementById('revelacao-secreta').innerText = fraseSalva;
-
-                visualEscrita.style.display = "none";
-                visualDesenho.style.display = "none";
-                visualRevelacao.style.display = "flex";
-
-                labelRodada.innerText = "Passo 3: Nossa Revelação ❤️";
-                btnAcao.innerText = "Jogar Novo Momento 🔄";
-                estadoAtual = "REVELACAO";
-
-            } else if (estadoAtual === "REVELACAO") {
-                // Reseta tudo para o ciclo inicial
-                campoFrase.value = "";
-                limparLousa();
-                estadoAtual = "INICIO";
-                avancarFluxo();
-            }
+            });
         }
 
-        // Confirmação de que o aparelho mudou de mãos (Mantém o segredo)
-        function confirmarTrocaParceiro() {
-            document.getElementById('tela-transicao').style.display = "none";
-            
-            document.getElementById('visual-escrita').style.display = "none";
-            document.getElementById('visual-desenho').style.display = "flex";
-            
-            document.getElementById('label-rodada').innerText = "Passo 2: Desenhar sem Olhar!";
-            document.getElementById('btn-acao-principal').innerText = "Finalizar Obra de Arte 🎨";
-            
-            // Força o ajuste do canvas e pincel após tornar o container visível
-            redimensionarCanvas();
-            
-            estadoAtual = "DESENHO";
+        // Funções Auxiliares de Interface Sincronizada
+        function mostrarApenasSubtela(idSubtela) {
+            document.getElementById('fase-espera').style.display = "none";
+            document.getElementById('fase-escrita').style.display = "none";
+            document.getElementById('fase-desenho').style.display = "none";
+            document.getElementById('fase-revelacao').style.display = "none";
+            document.getElementById(idSubtela).style.display = "flex";
         }
 
-        // --- SISTEMA DA LOUSA DE DESENHO (Mecanismo Preciso) ---
+        function renderizarTelaEspera(titulo, sub) {
+            mostrarApenasSubtela("fase-espera");
+            document.getElementById('fase-espera').querySelector('h2').innerText = titulo;
+            document.getElementById('texto-espera').innerText = sub;
+        }
+
+        function configurarBotaoLateral(texto, desabilitado, acaoClique = null) {
+            btnAcao.innerText = texto;
+            btnAcao.disabled = desabilitado;
+            btnAcao.onclick = acaoClique;
+        }
+
+        function EnviarFraseSecreta() {
+            const frase = document.getElementById('campo-frase-secreta').value.trim();
+            if(!frase) return alert("Escreva algo romântico ou especial antes de submeter!");
+            
+            estadoSalaRef.update({
+                fraseSecreta: frase,
+                status: "FASE_DESENHO"
+            });
+            document.getElementById('campo-frase-secreta').value = "";
+        }
+
+        function EnviarDesenhoFinal() {
+            const imagemData = canvas.toDataURL();
+            estadoSalaRef.update({
+                desenhoBase64: imagemData,
+                status: "FASE_REVELACAO"
+            });
+            limparLousa();
+        }
+
+        // --- SISTEMA INTERNO DA LOUSA DE DESENHO ---
         function redimensionarCanvas() {
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
@@ -617,23 +613,11 @@
             ctx.lineWidth = 4.5;
         }
 
-        // Captura de posições
         function obterCoordenadas(e) {
             const rect = canvas.getBoundingClientRect();
-            let clientX, clientY;
-
-            if (e.touches && e.touches.length > 0) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
-
-            return {
-                x: clientX - rect.left,
-                y: clientY - rect.top
-            };
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
         function iniciarDesenho(e) {
@@ -641,7 +625,7 @@
             const pos = obterCoordenadas(e);
             ctx.beginPath();
             ctx.moveTo(pos.x, pos.y);
-            e.preventDefault();
+            if(e.touches) e.preventDefault();
         }
 
         function moverDesenho(e) {
@@ -650,24 +634,18 @@
             ctx.strokeStyle = corAtual;
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
-            e.preventDefault();
+            if(e.touches) e.preventDefault();
         }
 
-        function pararDesenho() {
-            desenhando = false;
-            ctx.beginPath();
-        }
+        function pararDesenho() { desenhando = false; ctx.beginPath(); }
 
-        // Vinculação de eventos (Mouse + Telas Touch/Mobile)
         canvas.addEventListener('mousedown', iniciarDesenho);
         canvas.addEventListener('mousemove', moverDesenho);
         window.addEventListener('mouseup', pararDesenho);
-
         canvas.addEventListener('touchstart', iniciarDesenho, { passive: false });
         canvas.addEventListener('touchmove', moverDesenho, { passive: false });
         window.addEventListener('touchend', pararDesenho);
 
-        // Funções adicionais da paleta de cores
         function mudarCor(novaCor, elemento) {
             corAtual = novaCor;
             document.querySelectorAll('.cor-opcao').forEach(c => c.classList.remove('selecionada'));
@@ -680,13 +658,7 @@
             ctx.beginPath();
         }
 
-        // Inicialização Automática da Experiência
-        window.onload = () => {
-            inicializarTemas();
-            document.getElementById('texto-tema').innerText = temaAtual.tema;
-            document.getElementById('texto-dialogo').innerText = temaAtual.dialogo;
-            window.addEventListener('resize', redimensionarCanvas);
-        };
+        window.addEventListener('resize', () => { if(document.getElementById('fase-desenho').style.display === "flex") redimensionarCanvas(); });
     </script>
 </body>
 </html>
