@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Traços do Amor - Nosso Momento</title>
+    <title>Traços do Amor - Conexão Infinita</title>
     <style>
         :root {
             --cor-fundo: #fff0f3;
@@ -12,6 +12,7 @@
             --cor-secundaria: #ff758f;
             --cor-texto: #590d22;
             --cor-borda: #ffccd5;
+            --cor-fundo-claro: #fff5f7;
         }
 
         * {
@@ -28,168 +29,324 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
         }
 
         .jogo-container {
             background: var(--cor-painel);
             width: 100%;
-            max-width: 950px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.15);
+            max-width: 1100px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.12);
             border: 2px solid var(--cor-borda);
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 340px 1fr;
             overflow: hidden;
-            height: 650px;
+            height: 700px;
         }
 
-        /* Painel Lateral (Cartas e Conversa) */
+        /* PAINEL LATERAL (Status, Fluxo e Diálogo) */
         .painel-lateral {
             border-right: 2px solid var(--cor-borda);
-            background: #fffafa;
+            background: var(--cor-fundo-claro);
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 25px;
             justify-content: space-between;
+            overflow-y: auto;
         }
 
-        .titulo-jogo {
+        .cabecalho-jogo {
             text-align: center;
-            color: var(--cor-principal);
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-        }
-
-        .carta-tema {
-            background: linear-gradient(135deg, var(--cor-principal), var(--cor-secundaria));
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 6px 15px rgba(255, 77, 109, 0.3);
             margin-bottom: 20px;
         }
 
-        .carta-tema h3 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            opacity: 0.9;
+        .titulo-jogo {
+            color: var(--cor-principal);
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
-        .carta-tema p {
-            font-size: 1.2rem;
+        .rodada-status {
+            display: inline-block;
+            background: var(--cor-borda);
+            color: var(--cor-texto);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .caixa-contexto {
+            background: white;
+            border: 2px solid var(--cor-borda);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(255, 77, 109, 0.04);
+        }
+
+        .caixa-contexto h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--cor-secundaria);
+            margin-bottom: 8px;
+        }
+
+        .caixa-contexto p {
+            font-size: 1.1rem;
+            font-weight: 600;
             line-height: 1.4;
         }
 
-        .instrucoes-conversa {
-            background: #ffe5ec;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 0.9rem;
+        .painel-dialogo {
+            background: linear-gradient(135deg, #fff0f3, #ffe5ec);
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 0.95rem;
             line-height: 1.5;
-            border-left: 4px solid var(--cor-principal);
+            border-left: 5px solid var(--cor-principal);
+            margin-bottom: 20px;
+        }
+
+        .painel-dialogo strong {
+            color: var(--cor-principal);
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn {
             background: var(--cor-principal);
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 14px;
+            border-radius: 12px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             width: 100%;
             font-size: 1rem;
-            box-shadow: 0 4px 10px rgba(255, 77, 109, 0.2);
+            box-shadow: 0 4px 12px rgba(255, 77, 109, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn:hover {
             background: #ff2a55;
             transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 77, 109, 0.3);
         }
 
-        /* Área Principal do Desenho */
-        .area-desenho {
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* ÁREA CENTRAL DE JOGO (Gartic Phone Style) */
+        .area-central {
             display: flex;
             flex-direction: column;
             background: #ffffff;
-            padding: 20px;
+            padding: 25px;
+            position: relative;
         }
 
-        .topo-desenho {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .instrucao-passo {
+            font-size: 1.2rem;
+            font-weight: 700;
             margin-bottom: 15px;
+            color: var(--cor-texto);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        /* Lousa de desenho */
+        /* Tela de Escrita Secreta */
+        .tela-escrita {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            background: var(--cor-fundo-claro);
+            border: 3px dashed var(--cor-borda);
+            border-radius: 18px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .input-frase {
+            width: 100%;
+            max-width: 500px;
+            padding: 16px;
+            border: 2px solid var(--cor-borda);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            outline: none;
+            color: var(--cor-texto);
+            transition: border-color 0.2s;
+            text-align: center;
+        }
+
+        .input-frase:focus {
+            border-color: var(--cor-principal);
+            box-shadow: 0 0 0 4px rgba(255, 77, 109, 0.1);
+        }
+
+        /* Tela de Desenho */
+        .tela-desenho {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            display: none; /* Controlado via JS */
+        }
+
         canvas {
-            background: #fdfdfd;
+            background: #ffffff;
             border: 3px solid var(--cor-borda);
-            border-radius: 15px;
+            border-radius: 18px;
             cursor: crosshair;
             flex-grow: 1;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.03);
         }
 
-        /* Barra de Ferramentas (Paleta de cores romântica) */
-        .ferramentas {
+        .barra-ferramentas {
             display: flex;
             gap: 15px;
             align-items: center;
             margin-top: 15px;
-            padding: 10px;
-            background: #fff0f3;
-            border-radius: 12px;
+            padding: 12px 20px;
+            background: var(--cor-fundo-claro);
+            border-radius: 14px;
+            border: 1px solid var(--cor-borda);
         }
 
         .cores {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
         .cor-opcao {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: transform 0.1s;
+            border: 2.5px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: transform 0.15s ease;
         }
 
         .cor-opcao:hover {
-            transform: scale(1.15);
+            transform: scale(1.2);
         }
 
         .cor-opcao.selecionada {
             border-color: var(--cor-texto);
-            transform: scale(1.1);
+            transform: scale(1.15);
         }
 
         .btn-limpar {
-            background: #6c757d;
+            background: #748cab;
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
+            padding: 10px 18px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 0.9rem;
             margin-left: auto;
+            transition: background 0.2s;
         }
 
         .btn-limpar:hover {
-            background: #5a6268;
+            background: #3d5a80;
         }
 
-        /* Responsividade básica para telas menores */
-        @media (max-width: 768px) {
+        /* Tela de Transição / Passar o Aparelho */
+        .tela-transicao {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--cor-texto);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            z-index: 10;
+            padding: 30px;
+            text-align: center;
+            display: none; /* Controlado via JS */
+        }
+
+        .tela-transicao h2 {
+            font-size: 2.2rem;
+            color: var(--cor-secundaria);
+        }
+
+        /* Tela de Revelação Final */
+        .tela-revelacao {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .preview-desenho {
+            max-width: 100%;
+            max-height: 320px;
+            border: 3px solid var(--cor-borda);
+            border-radius: 18px;
+            background: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .comparacao {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .bloco-revelacao {
+            background: var(--cor-fundo-claro);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--cor-borda);
+        }
+
+        .bloco-revelacao span {
+            display: block;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--cor-secundaria);
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .bloco-revelacao p {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        /* Responsividade */
+        @media (max-width: 850px) {
             .jogo-container {
                 grid-template-columns: 1fr;
                 height: auto;
@@ -197,9 +354,10 @@
             .painel-lateral {
                 border-right: none;
                 border-bottom: 2px solid var(--cor-borda);
+                height: auto;
             }
             canvas {
-                height: 300px;
+                height: 350px;
             }
         }
     </style>
@@ -207,152 +365,313 @@
 <body>
 
     <div class="jogo-container">
+        
+        <!-- PAINEL LATERAL ESQUERDO (Acompanha toda a experiência) -->
         <div class="painel-lateral">
+            <div class="cabecalho-jogo">
+                <h2 class="titulo-jogo">Traços do Amor</h2>
+                <div class="rodada-status" id="label-rodada">Fase de Inspiração</div>
+            </div>
+
             <div>
-                <h2 class="titulo-jogo">Traços do Amor ❤️</h2>
-                
-                <div class="carta-tema">
-                    <h3>Sua Missão: Desenhe...</h3>
-                    <p id="texto-missao">O lugar do nosso primeiro beijo</p>
+                <div class="caixa-contexto" id="container-tema">
+                    <h3>Tema Inspirador</h3>
+                    <p id="texto-tema">Carregando história de amor...</p>
                 </div>
 
-                <div class="instrucoes-conversa">
-                    <strong>Espaço da Conversa:</strong><br>
-                    Não tenha pressa! Enquanto um desenha na tela ao lado, aproveitem para relembrar esse dia. O que você sentiu? Qual a sua memória favorita disso?
+                <div class="painel-dialogo" id="container-dialogo">
+                    <strong>Gatilho de Conversa 💬</strong>
+                    <span id="texto-dialogo">Aproveitem este momento inicial para alinhar os corações. Quem aqui tem a melhor memória sobre o início de tudo?</span>
                 </div>
             </div>
 
-            <button class="btn" onclick="mudarMissao()">Mudar de Momento ✨</button>
+            <button class="btn" id="btn-acao-principal" onclick="avancarFluxo()">
+                Começar Rodada ✨
+            </button>
         </div>
 
-        <div class="area-desenho">
-            <div class="topo-desenho">
-                <span style="font-weight: bold;">Sua Lousa Romântica🎨</span>
-                <span style="color: var(--cor-secundaria); font-size: 0.9rem;">Dica: Passem o mouse/notebook um para o outro a cada rodada!</span>
+        <!-- ÁREA CENTRAL DE INTERAÇÃO -->
+        <div class="area-central">
+            
+            <!-- TELA DE TRANSIÇÃO (Passar o dispositivo em segredo) -->
+            <div class="tela-transicao" id="tela-transicao">
+                <h2>Passa o Aparelho! 🔄</h2>
+                <p id="texto-transicao">Agora é a vez do seu par. Não vale olhar a tela antes que ela mude!</p>
+                <button class="btn" style="max-width: 250px; background: white; color: var(--cor-texto);" onclick="confirmarTrocaParceiro()">
+                    Já mudei de mãos! 👋
+                </button>
             </div>
 
-            <canvas id="lousa-amor"></canvas>
+            <!-- PASSO 1: ESCRITA SECRETA -->
+            <div class="tela-escrita" id="visual-escrita">
+                <div class="instrucao-passo">✍️ Defina o seu Momento Secreto</div>
+                <p style="color: var(--cor-texto); opacity: 0.8; font-size: 0.95rem;">Com base no tema ao lado, escreva uma frase curta que descreva exatamente a memória ou detalhe que você quer que seu amor desenhe.</p>
+                <input type="text" class="input-frase" id="campo-frase-secreta" placeholder="Ex: O dia em que tomamos chuva na praça..." autocomplete="off">
+            </div>
 
-            <div class="ferramentas">
-                <span>Cores do Amor:</span>
-                <div class="cores">
-                    <div class="cor-opcao selecionada" style="background: #ff4d6d;" onclick="mudarCor('#ff4d6d', this)"></div>
-                    <div class="cor-opcao" style="background: #ff758f;" onclick="mudarCor('#ff758f', this)"></div>
-                    <div class="cor-opcao" style="background: #ffb3c1;" onclick="mudarCor('#ffb3c1', this)"></div>
-                    <div class="cor-opcao" style="background: #590d22;" onclick="mudarCor('#590d22', this)"></div>
-                    <div class="cor-opcao" style="background: #3a86ff;" onclick="mudarCor('#3a86ff', this)"></div>
-                    <div class="cor-opcao" style="background: #ffbe0b;" onclick="mudarCor('#ffbe0b', this)"></div>
-                </div>
+            <!-- PASSO 2: DESENHO (Estilo Gartic clássico e direto) -->
+            <div class="tela-desenho" id="visual-desenho">
+                <div class="instrucao-passo">🎨 Hora de Desenhar!</div>
                 
-                <button class="btn-limpar" onclick="limparLousa()">Apagar Tudo 🗑️</button>
+                <canvas id="lousa-amor"></canvas>
+
+                <div class="barra-ferramentas">
+                    <div class="cores">
+                        <div class="cor-opcao selecionada" style="background: #ff4d6d;" onclick="mudarCor('#ff4d6d', this)"></div>
+                        <div class="cor-opcao" style="background: #ff758f;" onclick="mudarCor('#ff758f', this)"></div>
+                        <div class="cor-opcao" style="background: #590d22;" onclick="mudarCor('#590d22', this)"></div>
+                        <div class="cor-opcao" style="background: #0077b6;" onclick="mudarCor('#0077b6', this)"></div>
+                        <div class="cor-opcao" style="background: #00b4d8;" onclick="mudarCor('#00b4d8', this)"></div>
+                        <div class="cor-opcao" style="background: #ffb703;" onclick="mudarCor('#ffb703', this)"></div>
+                        <div class="cor-opcao" style="background: #2a9d8f;" onclick="mudarCor('#2a9d8f', this)"></div>
+                        <div class="cor-opcao" style="background: #000000;" onclick="mudarCor('#000000', this)"></div>
+                    </div>
+                    
+                    <button class="btn-limpar" onclick="limparLousa()">Limpar Tela 🗑️</button>
+                </div>
             </div>
+
+            <!-- PASSO 3: REVELAÇÃO E DIÁLOGO FINAL -->
+            <div class="tela-revelacao" id="visual-revelacao">
+                <div class="instrucao-passo">❤️ Olha o resultado!</div>
+                
+                <img id="imagem-resultado" class="preview-desenho" alt="Desenho de Amor">
+
+                <div class="comparacao">
+                    <div class="bloco-revelacao">
+                        <span>O que foi pedido:</span>
+                        <p id="revelacao-pedido">-</p>
+                    </div>
+                    <div class="bloco-revelacao">
+                        <span>A frase secreta era:</span>
+                        <p id="revelacao-secreta">-</p>
+                    </div>
+                </div>
+                <p style="font-size: 0.95rem; max-width: 500px; font-style: italic; opacity: 0.9;">Conversem sobre o desenho! Ficou parecido? O que passou na cabeça de vocês nessa lembrança?</p>
+            </div>
+
         </div>
+
     </div>
 
     <script>
-        // --- BANCO DE IDEIAS E DIÁLOGOS ROMÂNTICOS ---
-        const ideiasRomanticas = [
-            "O lugar do nosso primeiro beijo.",
-            "Um presente marcante que você já me deu.",
-            "A comida que a gente mais ama comer juntos.",
-            "A viagem ou passeio mais inesquecível que fizemos.",
-            "Como você imagina a nossa casa no futuro.",
-            "O seu primeiro apelido carinhoso para mim.",
-            "Uma pose ou foto clássica nossa que você adora.",
-            "O animal de estimação que deveríamos ter juntos.",
-            "A roupa que eu estava usando quando você me achou incrivelmente linda(o).",
-            "O primeiro filme ou série que assistimos coladinhos.",
-            "O que você sentiu no dia em que me conheceu."
+        // --- BANCO DE DADOS DINÂMICO, EXPANSIVO E NÃO REPETITIVO ---
+        const bancoTemasEstrategicos = [
+            {
+                tema: "O Nosso Começo Absoluto",
+                dialogo: "Enquanto escreve, comente: Qual detalhe bobo do dia em que nos conhecemos você lembra e acha que o outro já esqueceu?"
+            },
+            {
+                tema: "O Primeiro Beijo",
+                dialogo: "Converse com o parceiro: O que causou mais frio na barriga antes de acontecer? O ambiente, o som ao redor, ou o medo de dar errado?"
+            },
+            {
+                tema: "Uma Viagem ou Passeio Inesquecível",
+                dialogo: "Relembrem juntos: Qual foi o momento de perrengue ou a risada mais descontrolada que demos durante esse dia específico?"
+            },
+            {
+                tema: "Nossa Rotina Perfeita de Domingo",
+                dialogo: "Pensem alto: Se pudéssemos congelar um único domingo preguiçoso que passamos colados, qual domingo seria e por quê?"
+            },
+            {
+                tema: "A Comida que Une Nossos Corações",
+                dialogo: "Momento gula: Qual prato ou delivery se transformou na nossa marca registrada oficial de quando queremos celebrar?"
+            },
+            {
+                tema: "O Futuro Que Estamos Construindo",
+                dialogo: "Sonhando acordados: Como você imagina os detalhes físicos da sala de estar ou do quintal da nossa casa daqui a alguns anos?"
+            },
+            {
+                tema: "Um Presente ou Gesto Marcante",
+                dialogo: "Sensibilidade: Além do objeto material, qual foi a sensação de perceber o cuidado e o tempo que o outro gastou para te agradar?"
+            },
+            {
+                tema: "Uma Mania Engraçada Minha Que Você Ama",
+                dialogo: "Risadas: Qual tique, expressão ou mania fofa o outro faz sem perceber quando está concentrado ou com vergonha?"
+            },
+            {
+                tema: "O Dia em Que Eu Te Achei Irresistível",
+                dialogo: "Confissão direta: Detalhe o visual, a roupa ou o jeito que o parceiro agiu naquele dia que fez seu coração errar a batida."
+            },
+            {
+                tema: "O Nosso Filme, Série ou Trilha Sonora",
+                dialogo: "Cultura a dois: Que história fictícia ou música parece ter sido escrita perfeitamente para traduzir a nossa jornada?"
+            },
+            {
+                tema: "Um Apelido Carinhoso ou Piada Interna",
+                dialogo: "Cumplicidade: Como surgiu aquela palavra boba que só nós dois entendemos e que faz a gente rir no meio do público?"
+            },
+            {
+                tema: "Um Momento em que Fomos um Time Forte",
+                dialogo: "Superação: Relembrem um dia em que apoiamos um ao outro em uma dificuldade. Como isso nos deixou ainda mais inseparáveis?"
+            }
         ];
 
-        let ultimaMissao = -1;
+        // Controle de Estado do Jogo (Gartic Phone Flow)
+        let filaDeTemas = [];
+        let temaAtual = null;
+        let estadoAtual = "INICIO"; // Estados: INICIO, ESCRITA, TRANSAO_DESENHO, DESENHO, REVELACAO
+        let fraseSalva = "";
 
-        function mudarMissao() {
-            let indiceAleatorio;
-            
-            // Evita repetir a mesma carta em seguida
-            do {
-                indiceAleatorio = Math.floor(Math.random() * ideiasRomanticas.length);
-            } while (indiceAleatorio === ultimaMissao);
-
-            ultimaMissao = indiceAleatorio;
-            document.getElementById('texto-missao').innerText = ideiasRomanticas[indiceAleatorio];
-            limparLousa();
-        }
-
-        // --- SISTEMA DE DESENHO (CANVAS) ---
+        // Inicialização do Sistema de Desenho
         const canvas = document.getElementById('lousa-amor');
         const ctx = canvas.getContext('2d');
-        
         let desenhando = false;
         let corAtual = '#ff4d6d';
 
-        // Ajusta o tamanho interno do canvas para preencher a tela corretamente
+        // Carrega e embaralha os temas para nunca repetir até esgotar o banco
+        function inicializarTemas() {
+            if (filaDeTemas.length === 0) {
+                filaDeTemas = [...bancoTemasEstrategicos];
+                // Algoritmo Fisher-Yates para embaralhamento real
+                for (let i = filaDeTemas.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [filaDeTemas[i], filaDeTemas[j]] = [filaDeTemas[j], filaDeTemas[i]];
+                }
+            }
+            temaAtual = filaDeTemas.pop();
+        }
+
+        // Controlador de Fluxo Central do Jogo
+        function avancarFluxo() {
+            const visualEscrita = document.getElementById('visual-escrita');
+            const visualDesenho = document.getElementById('visual-desenho');
+            const visualRevelacao = document.getElementById('visual-revelacao');
+            const btnAcao = document.getElementById('btn-acao-principal');
+            const labelRodada = document.getElementById('label-rodada');
+            const campoFrase = document.getElementById('campo-frase-secreta');
+
+            if (estadoAtual === "INICIO") {
+                // Prepara nova rodada
+                inicializarTemas();
+                document.getElementById('texto-tema').innerText = temaAtual.tema;
+                document.getElementById('texto-dialogo').innerText = temaAtual.dialogo;
+                
+                // Vai para escrita
+                visualEscrita.style.display = "flex";
+                visualDesenho.style.display = "none";
+                visualRevelacao.style.display = "none";
+                
+                labelRodada.innerText = "Passo 1: Descrição Secreta";
+                btnAcao.innerText = "Travar Frase e Passar 🔒";
+                estadoAtual = "ESCRITA";
+
+            } else if (estadoAtual === "ESCRITA") {
+                fraseSalva = campoFrase.value.trim();
+                if (!fraseSalva) {
+                    alert("Por favor, digite uma frase romântica ou momento antes de continuar!");
+                    return;
+                }
+
+                // Aciona a cortina de transição estilo Gartic Phone
+                document.getElementById('tela-transicao').style.display = "flex";
+                estadoAtual = "TRANSICAO_DESENHO";
+
+            } else if (estadoAtual === "DESENHO") {
+                // Finaliza o desenho, gera imagem estática e vai para Revelação
+                const imagemData = canvas.toDataURL();
+                document.getElementById('imagem-resultado').src = imagemData;
+                
+                document.getElementById('revelacao-pedido').innerText = temaAtual.tema;
+                document.getElementById('revelacao-secreta').innerText = fraseSalva;
+
+                visualEscrita.style.display = "none";
+                visualDesenho.style.display = "none";
+                visualRevelacao.style.display = "flex";
+
+                labelRodada.innerText = "Passo 3: Nossa Revelação ❤️";
+                btnAcao.innerText = "Jogar Novo Momento 🔄";
+                estadoAtual = "REVELACAO";
+
+            } else if (estadoAtual === "REVELACAO") {
+                // Reseta tudo para o ciclo inicial
+                campoFrase.value = "";
+                limparLousa();
+                estadoAtual = "INICIO";
+                avancarFluxo();
+            }
+        }
+
+        // Confirmação de que o aparelho mudou de mãos (Mantém o segredo)
+        function confirmarTrocaParceiro() {
+            document.getElementById('tela-transicao').style.display = "none";
+            
+            document.getElementById('visual-escrita').style.display = "none";
+            document.getElementById('visual-desenho').style.display = "flex";
+            
+            document.getElementById('label-rodada').innerText = "Passo 2: Desenhar sem Olhar!";
+            document.getElementById('btn-acao-principal').innerText = "Finalizar Obra de Arte 🎨";
+            
+            // Força o ajuste do canvas e pincel após tornar o container visível
+            redimensionarCanvas();
+            
+            estadoAtual = "DESENHO";
+        }
+
+        // --- SISTEMA DA LOUSA DE DESENHO (Mecanismo Preciso) ---
         function redimensionarCanvas() {
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
-            
-            // Garante configurações de pincel suave
             ctx.lineCap = 'round';
-            ctx.lineWidth = 4;
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = 4.5;
         }
 
-        // Eventos do Mouse
-        canvas.addEventListener('mousedown', (e) => {
-            desenhando = true;
-            desenhar(e);
-        });
-
-        canvas.addEventListener('mousemove', desenhar);
-        window.addEventListener('mouseup', () => desenhando = false);
-
-        // Eventos de Toque para Celular/Tablet
-        canvas.addEventListener('touchstart', (e) => {
-            desenhando = true;
-            const toque = e.touches[0];
-            const mouseEvent = new MouseEvent("mousedown", {
-                clientX: toque.clientX,
-                clientY: toque.clientY
-            });
-            canvas.dispatchEvent(mouseEvent);
-        });
-
-        canvas.addEventListener('touchmove', (e) => {
-            const toque = e.touches[0];
-            const mouseEvent = new MouseEvent("mousemove", {
-                clientX: toque.clientX,
-                clientY: toque.clientY
-            });
-            canvas.dispatchEvent(mouseEvent);
-        }, { passive: true });
-
-        window.addEventListener('touchend', () => desenhando = false);
-
-        function desenhar(e) {
-            if (!desenhando) return;
-
-            // Pega a posição exata em relação ao canvas
+        // Captura de posições
+        function obterCoordenadas(e) {
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches?.[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches?.[0].clientY) - rect.top;
+            let clientX, clientY;
 
-            ctx.strokeStyle = corAtual;
-            
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
         }
 
-        // Funções da paleta
+        function iniciarDesenho(e) {
+            desenhando = true;
+            const pos = obterCoordenadas(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            e.preventDefault();
+        }
+
+        function moverDesenho(e) {
+            if (!desenhando) return;
+            const pos = obterCoordenadas(e);
+            ctx.strokeStyle = corAtual;
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            e.preventDefault();
+        }
+
+        function pararDesenho() {
+            desenhando = false;
+            ctx.beginPath();
+        }
+
+        // Vinculação de eventos (Mouse + Telas Touch/Mobile)
+        canvas.addEventListener('mousedown', iniciarDesenho);
+        canvas.addEventListener('mousemove', moverDesenho);
+        window.addEventListener('mouseup', pararDesenho);
+
+        canvas.addEventListener('touchstart', iniciarDesenho, { passive: false });
+        canvas.addEventListener('touchmove', moverDesenho, { passive: false });
+        window.addEventListener('touchend', pararDesenho);
+
+        // Funções adicionais da paleta de cores
         function mudarCor(novaCor, elemento) {
             corAtual = novaCor;
-            
-            // Atualiza classe selecionada na interface
             document.querySelectorAll('.cor-opcao').forEach(c => c.classList.remove('selecionada'));
             elemento.classList.add('selecionada');
-            
-            // Reseta o caminho para não misturar cores retroativamente
             ctx.beginPath();
         }
 
@@ -361,10 +680,11 @@
             ctx.beginPath();
         }
 
-        // Inicialização do Canvas ao carregar a página
+        // Inicialização Automática da Experiência
         window.onload = () => {
-            redimensionarCanvas();
-            // Recalcula se a janela mudar de tamanho
+            inicializarTemas();
+            document.getElementById('texto-tema').innerText = temaAtual.tema;
+            document.getElementById('texto-dialogo').innerText = temaAtual.dialogo;
             window.addEventListener('resize', redimensionarCanvas);
         };
     </script>
