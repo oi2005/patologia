@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nosso Amor - Feliz Dia dos Namorados</title>
+    <title>Traços do Amor - Nosso Momento</title>
     <style>
-        /* Cores e Fontes Globais */
         :root {
-            --cor-fundo: #ffeef2;
+            --cor-fundo: #fff0f3;
+            --cor-painel: #ffffff;
             --cor-principal: #ff4d6d;
             --cor-secundaria: #ff758f;
             --cor-texto: #590d22;
-            --cor-card: #ffffff;
+            --cor-borda: #ffccd5;
         }
 
         * {
@@ -26,349 +26,347 @@
             color: var(--cor-texto);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow-x: hidden;
-            position: relative;
         }
 
-        /* Efeito de corações flutuantes no fundo */
-        .coracao-flutuante {
-            position: absolute;
-            color: var(--cor-secundaria);
-            opacity: 0.6;
-            pointer-events: none;
-            animation: flutuar 6s linear infinite;
-            font-size: 20px;
-        }
-
-        @keyframes flutuar {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-10vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        /* Container Principal */
-        .container {
-            background: var(--cor-card);
-            max-width: 500px;
+        .jogo-container {
+            background: var(--cor-painel);
             width: 100%;
+            max-width: 950px;
             border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.2);
+            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.15);
+            border: 2px solid var(--cor-borda);
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            overflow: hidden;
+            height: 650px;
+        }
+
+        /* Painel Lateral (Cartas e Conversa) */
+        .painel-lateral {
+            border-right: 2px solid var(--cor-borda);
+            background: #fffafa;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            justify-content: space-between;
+        }
+
+        .titulo-jogo {
             text-align: center;
-            border: 2px solid #ffccd5;
-            z-index: 10;
-        }
-
-        h1 {
             color: var(--cor-principal);
-            margin-bottom: 10px;
-            font-size: 2rem;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
         }
 
-        p.subtitulo {
-            font-size: 1.1rem;
-            margin-bottom: 25px;
-            color: var(--cor-secundaria);
+        .carta-tema {
+            background: linear-gradient(135deg, var(--cor-principal), var(--cor-secundaria));
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(255, 77, 109, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .carta-tema h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .carta-tema p {
+            font-size: 1.2rem;
             font-weight: bold;
+            line-height: 1.4;
         }
 
-        /* Telas do Jogo */
-        .tela {
-            display: none;
+        .instrucoes-conversa {
+            background: #ffe5ec;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border-left: 4px solid var(--cor-principal);
         }
 
-        .tela.ativa {
-            display: block;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Botões */
         .btn {
-            background-color: var(--cor-principal);
+            background: var(--cor-principal);
             color: white;
             border: none;
-            padding: 12px 25px;
-            font-size: 1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            padding: 12px;
+            border-radius: 10px;
             font-weight: bold;
-            margin-top: 15px;
-            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+            cursor: pointer;
+            transition: all 0.2s;
             width: 100%;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(255, 77, 109, 0.2);
         }
 
         .btn:hover {
-            background-color: #ff2a55;
+            background: #ff2a55;
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 77, 109, 0.4);
         }
 
-        /* Estilos do Quiz */
-        .opcoes-container {
+        /* Área Principal do Desenho */
+        .area-desenho {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .btn-opcao {
-            background-color: #fff0f3;
-            color: var(--cor-texto);
-            border: 2px solid #ffccd5;
-            padding: 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-            text-align: left;
-            padding-left: 20px;
-            font-weight: 500;
-        }
-
-        .btn-opcao:hover {
-            background-color: #ffccd5;
-            border-color: var(--cor-secundaria);
-        }
-
-        /* Feedback visual do quiz */
-        .btn-opcao.correta {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-
-        .btn-opcao.errada {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
-
-        /* Tela Final e Carta */
-        .carta-amor {
-            background: #fffafb;
-            border: 1px dashed var(--cor-secundaria);
+            background: #ffffff;
             padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: left;
-            line-height: 1.6;
-            font-style: italic;
-            box-shadow: inset 0 0 10px rgba(255, 117, 143, 0.1);
         }
 
-        /* Jogo Extra: O Botão Fujão */
-        .jogo-pergunta {
-            margin-top: 25px;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .botoes-sim-nao {
+        .topo-desenho {
             display: flex;
-            gap: 20px;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        /* Lousa de desenho */
+        canvas {
+            background: #fdfdfd;
+            border: 3px solid var(--cor-borda);
+            border-radius: 15px;
+            cursor: crosshair;
+            flex-grow: 1;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Barra de Ferramentas (Paleta de cores romântica) */
+        .ferramentas {
+            display: flex;
+            gap: 15px;
+            align-items: center;
             margin-top: 15px;
-            position: relative;
-            height: 60px;
+            padding: 10px;
+            background: #fff0f3;
+            border-radius: 12px;
         }
 
-        #btn-sim {
-            width: auto;
-            min-width: 120px;
-            position: absolute;
-            left: 20%;
+        .cores {
+            display: flex;
+            gap: 8px;
         }
 
-        #btn-nao {
-            width: auto;
-            min-width: 120px;
-            position: absolute;
-            right: 20%;
-            background-color: #6c757d;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        .cor-opcao {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+
+        .cor-opcao:hover {
+            transform: scale(1.15);
+        }
+
+        .cor-opcao.selecionada {
+            border-color: var(--cor-texto);
+            transform: scale(1.1);
+        }
+
+        .btn-limpar {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        .btn-limpar:hover {
+            background: #5a6268;
+        }
+
+        /* Responsividade básica para telas menores */
+        @media (max-width: 768px) {
+            .jogo-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .painel-lateral {
+                border-right: none;
+                border-bottom: 2px solid var(--cor-borda);
+            }
+            canvas {
+                height: 300px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Feliz Dia dos Namorados! ❤️</h1>
-        <p class="subtitulo">O Quiz do Nosso Amor</p>
-
-        <div id="tela-inicio" class="tela ativa">
-            <p>Preparei um desafio especial para testar o quanto você conhece a nossa história. Está pronta(o) para começar?</p>
-            <button class="btn" onclick="iniciarJogo()">Começar o Desafio</button>
-        </div>
-
-        <div id="tela-quiz" class="tela">
-            <h3 id="pergunta-texto">Pergunta aqui?</h3>
-            <div class="opcoes-container" id="opcoes-container">
+    <div class="jogo-container">
+        <div class="painel-lateral">
+            <div>
+                <h2 class="titulo-jogo">Traços do Amor ❤️</h2>
+                
+                <div class="carta-tema">
+                    <h3>Sua Missão: Desenhe...</h3>
+                    <p id="texto-missao">O lugar do nosso primeiro beijo</p>
                 </div>
-        </div>
 
-        <div id="tela-final" class="tela">
-            <h2>Você acertou tudo! 🎉</h2>
-            <p style="margin-top: 10px;">Você provou que presta atenção em cada detalhe do nosso amor.</p>
-            
-            <div class="carta-amor">
-                "Desde que você entrou na minha vida, todos os dias parecem Dia dos Namorados. Cada risada, cada conversa e cada momento simples ao seu lado se tornaram os meus tesouros mais valiosos. Obrigado(a) por ser meu amor, meu porto seguro e minha melhor escolha. Eu te amo daqui até o infinito!"
+                <div class="instrucoes-conversa">
+                    <strong>Espaço da Conversa:</strong><br>
+                    Não tenha pressa! Enquanto um desenha na tela ao lado, aproveitem para relembrar esse dia. O que você sentiu? Qual a sua memória favorita disso?
+                </div>
             </div>
 
-            <p class="jogo-pergunta">Quer namorar comigo para sempre?</p>
-            <div class="botoes-sim-nao">
-                <button class="btn" id="btn-sim" onclick="aceitouNamoro()">SIM!</button>
-                <button class="btn" id="btn-nao" onmouseover="fujir DoBotao()" onclick="fujirDoBotao()">NÃO</button>
+            <button class="btn" onclick="mudarMissao()">Mudar de Momento ✨</button>
+        </div>
+
+        <div class="area-desenho">
+            <div class="topo-desenho">
+                <span style="font-weight: bold;">Sua Lousa Romântica🎨</span>
+                <span style="color: var(--cor-secundaria); font-size: 0.9rem;">Dica: Passem o mouse/notebook um para o outro a cada rodada!</span>
+            </div>
+
+            <canvas id="lousa-amor"></canvas>
+
+            <div class="ferramentas">
+                <span>Cores do Amor:</span>
+                <div class="cores">
+                    <div class="cor-opcao selecionada" style="background: #ff4d6d;" onclick="mudarCor('#ff4d6d', this)"></div>
+                    <div class="cor-opcao" style="background: #ff758f;" onclick="mudarCor('#ff758f', this)"></div>
+                    <div class="cor-opcao" style="background: #ffb3c1;" onclick="mudarCor('#ffb3c1', this)"></div>
+                    <div class="cor-opcao" style="background: #590d22;" onclick="mudarCor('#590d22', this)"></div>
+                    <div class="cor-opcao" style="background: #3a86ff;" onclick="mudarCor('#3a86ff', this)"></div>
+                    <div class="cor-opcao" style="background: #ffbe0b;" onclick="mudarCor('#ffbe0b', this)"></div>
+                </div>
+                
+                <button class="btn-limpar" onclick="limparLousa()">Apagar Tudo 🗑️</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURAÇÃO DAS PERGUNTAS DO QUIZ ---
-        // Você pode alterar as perguntas, opções e a resposta correta (índice começando em 0)
-        const perguntas = [
-            {
-                pergunta: "Onde foi o nosso primeiro encontro oficial?",
-                opcoes: ["No cinema", "Num restaurante/lanchonete", "No parque", "Na casa de amigos"],
-                correta: 1
-            },
-            {
-                pergunta: "Quem disse 'eu te amo' primeiro?",
-                opcoes: ["Eu", "Você", "Os dois juntos", "Nenhum ainda"],
-                correta: 0
-            },
-            {
-                pergunta: "Qual é a nossa comida favorita para pedir no final de semana?",
-                opcoes: ["Pizza", "Hambúrguer", "Comida Japonesa", "Massa/Italiana"],
-                correta: 0
-            },
-            {
-                pergunta: "Qual é o meu maior sonho ao seu lado?",
-                opcoes: ["Viajar o mundo juntos", "Construir uma família e envelhecer juntos", "Comprar uma casa gigante", "Todas as alternativas anteriores!"],
-                correta: 3
-            }
+        // --- BANCO DE IDEIAS E DIÁLOGOS ROMÂNTICOS ---
+        const ideiasRomanticas = [
+            "O lugar do nosso primeiro beijo.",
+            "Um presente marcante que você já me deu.",
+            "A comida que a gente mais ama comer juntos.",
+            "A viagem ou passeio mais inesquecível que fizemos.",
+            "Como você imagina a nossa casa no futuro.",
+            "O seu primeiro apelido carinhoso para mim.",
+            "Uma pose ou foto clássica nossa que você adora.",
+            "O animal de estimação que deveríamos ter juntos.",
+            "A roupa que eu estava usando quando você me achou incrivelmente linda(o).",
+            "O primeiro filme ou série que assistimos coladinhos.",
+            "O que você sentiu no dia em que me conheceu."
         ];
 
-        let perguntaAtual = 0;
+        let ultimaMissao = -1;
 
-        // Inicia o Quiz
-        function iniciarJogo() {
-            document.getElementById('tela-inicio').classList.remove('ativa');
-            document.getElementById('tela-quiz').classList.add('ativa');
-            carregarPergunta();
+        function mudarMissao() {
+            let indiceAleatorio;
+            
+            // Evita repetir a mesma carta em seguida
+            do {
+                indiceAleatorio = Math.floor(Math.random() * ideiasRomanticas.length);
+            } while (indiceAleatorio === ultimaMissao);
+
+            ultimaMissao = indiceAleatorio;
+            document.getElementById('texto-missao').innerText = ideiasRomanticas[indiceAleatorio];
+            limparLousa();
         }
 
-        // Carrega a pergunta atual na tela
-        function carregarPergunta() {
-            const dadosPergunta = perguntas[perguntaAtual];
-            document.getElementById('pergunta-texto').innerText = dadosPergunta.pergunta;
-            
-            const containerOpcoes = document.getElementById('opcoes-container');
-            containerOpcoes.innerHTML = ''; // Limpa as opções anteriores
+        // --- SISTEMA DE DESENHO (CANVAS) ---
+        const canvas = document.getElementById('lousa-amor');
+        const ctx = canvas.getContext('2d');
+        
+        let desenhando = false;
+        let corAtual = '#ff4d6d';
 
-            dadosPergunta.opcoes.forEach((opcao, index) => {
-                const botao = document.createElement('button');
-                botao.classList.add('btn-opcao');
-                botao.innerText = opcao;
-                botao.onclick = () => verificarResposta(index, botao);
-                containerOpcoes.appendChild(botao);
+        // Ajusta o tamanho interno do canvas para preencher a tela corretamente
+        function redimensionarCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Garante configurações de pincel suave
+            ctx.lineCap = 'round';
+            ctx.lineWidth = 4;
+        }
+
+        // Eventos do Mouse
+        canvas.addEventListener('mousedown', (e) => {
+            desenhando = true;
+            desenhar(e);
+        });
+
+        canvas.addEventListener('mousemove', desenhar);
+        window.addEventListener('mouseup', () => desenhando = false);
+
+        // Eventos de Toque para Celular/Tablet
+        canvas.addEventListener('touchstart', (e) => {
+            desenhando = true;
+            const toque = e.touches[0];
+            const mouseEvent = new MouseEvent("mousedown", {
+                clientX: toque.clientX,
+                clientY: toque.clientY
             });
-        }
+            canvas.dispatchEvent(mouseEvent);
+        });
 
-        // Verifica se a resposta está certa ou errada
-        function verificarResposta(indiceSelecionado, botaoClicado) {
-            const dadosPergunta = perguntas[perguntaAtual];
-            const todosBotoes = document.querySelectorAll('.btn-opcao');
+        canvas.addEventListener('touchmove', (e) => {
+            const toque = e.touches[0];
+            const mouseEvent = new MouseEvent("mousemove", {
+                clientX: toque.clientX,
+                clientY: toque.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }, { passive: true });
 
-            // Desabilita todos os botões para evitar cliques repetidos durante a transição
-            todosBotoes.forEach(b => b.style.pointerEvents = 'none');
+        window.addEventListener('touchend', () => desenhando = false);
 
-            if (indiceSelecionado === dadosPergunta.correta) {
-                botaoClicado.classList.add('correta');
-                // Solta alguns corações comemorativos
-                for(let i=0; i<5; i++) criarCoracao();
-                
-                perguntaAtual++;
-                
-                setTimeout(() => {
-                    if (perguntaAtual < perguntas.length) {
-                        carregarPergunta();
-                    } else {
-                        mostrarTelaFinal();
-                    }
-                }, 1200);
-            } else {
-                botaoClicado.classList.add('errada');
-                alert("Ah não! Tente lembrar de novo com o coração... ❤️");
-                
-                setTimeout(() => {
-                    todosBotoes.forEach(b => {
-                        b.classList.remove('errada');
-                        b.style.pointerEvents = 'auto';
-                    });
-                }, 1000);
-            }
-        }
+        function desenhar(e) {
+            if (!desenhando) return;
 
-        // Mostra a tela de sucesso final
-        function mostrarTelaFinal() {
-            document.getElementById('tela-quiz').classList.remove('ativa');
-            document.getElementById('tela-final').classList.add('ativa');
-            // Chuva intensa de corações
-            setInterval(criarCoracao, 300);
-        }
+            // Pega a posição exata em relação ao canvas
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches?.[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches?.[0].clientY) - rect.top;
 
-        // Faz o botão "NÃO" fugir do mouse ou do clique
-        function fujirDoBotao() {
-            const btnNao = document.getElementById('btn-nao');
-            // Gera posições aleatórias para o botão desviar dentro do container de forma divertida
-            const xAleatorio = Math.floor(Math.random() * 160) - 80;
-            const yAleatorio = Math.floor(Math.random() * 80) - 40;
+            ctx.strokeStyle = corAtual;
             
-            btnNao.style.transform = `translate(${xAleatorio}px, ${yAleatorio}px)`;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
         }
 
-        // Ação ao clicar no botão SIM
-        function aceitouNamoro() {
-            alert("Ebaaaaa! Eu já sabia que a resposta seria SIM! Te amo demais! ❤️🎉");
-            for(let i = 0; i < 30; i++) {
-                setTimeout(criarCoracao, i * 50);
-            }
-        }
-
-        // Função auxiliar para gerar corações caindo/flutuando no fundo
-        function criarCoracao() {
-            const coracao = document.createElement('div');
-            coracao.classList.add('coracao-flutuante');
-            coracao.innerText = '❤️';
-            coracao.style.left = Math.random() * 100 + 'vw';
-            coracao.style.animationDuration = (Math.random() * 3 + 3) + 's'; // Entre 3 e 6 segundos
-            coracao.style.fontSize = (Math.random() * 20 + 15) + 'px';
+        // Funções da paleta
+        function mudarCor(novaCor, elemento) {
+            corAtual = novaCor;
             
-            document.body.appendChild(coracao);
-
-            // Remove o coração após o fim da animação para não sobrecarregar a memória
-            setTimeout(() => {
-                coracao.remove();
-            }, 6000);
+            // Atualiza classe selecionada na interface
+            document.querySelectorAll('.cor-opcao').forEach(c => c.classList.remove('selecionada'));
+            elemento.classList.add('selecionada');
+            
+            // Reseta o caminho para não misturar cores retroativamente
+            ctx.beginPath();
         }
 
-        // Cria alguns corações em intervalos regulares desde o início da página
-        setInterval(criarCoracao, 800);
+        function limparLousa() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+        }
+
+        // Inicialização do Canvas ao carregar a página
+        window.onload = () => {
+            redimensionarCanvas();
+            // Recalcula se a janela mudar de tamanho
+            window.addEventListener('resize', redimensionarCanvas);
+        };
     </script>
 </body>
 </html>
