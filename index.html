@@ -321,7 +321,6 @@
         .chat-input-field { flex: 1; padding: 6px; border: 2px solid var(--cor-borda); border-radius: 5px; outline: none; font-size: 12px; }
         .chat-send-btn { background: var(--cor-principal); color: white; margin-left: 4px; font-size: 11px; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
-        /* PAINEL EXCLUSIVO DE CONVERSA DO CASAL */
         #dialogue-trigger-panel {
             background: linear-gradient(135deg, #fff0f3, #ffe5ec);
             border: 2px solid var(--cor-borda);
@@ -627,7 +626,6 @@
     let gameEnded = false;
     const PONTUACAO_MAXIMA = 100;
     
-    // BANCO DE DADOS FORMATADO EM OBJETOS COM DIÁLOGOS DIRETOS E NÃO REPETITIVOS
     const PALAVRAS_PADRAO_OBJ = [
         { palavra: "Primeiro Beijo", dialogo: "Quem deu o primeiro passo nesse dia e o que você sentiu exatamente um segundo antes?" },
         { palavra: "Cinema", dialogo: "Qual foi o primeiro filme ou série que assistimos coladinhos e quem dormiu no meio?" },
@@ -636,7 +634,7 @@
         { palavra: "Abraço", dialogo: "Qual o melhor momento do dia para receber aquele abraço que zera todos os problemas do mundo?" },
         { palavra: "Café da Manhã", dialogo: "Quem é mais provável de acordar primeiro e preparar uma surpresa gostosa na cama?" },
         { palavra: "Alianças", dialogo: "Se pudéssemos escolher qualquer lugar do universo para celebrar nossa união, onde seria?" },
-        { palavra: " piquenique", dialogo: "Se fôssemos passar uma tarde inteira isolados em um parque, qual música de fundo escolheríamos?" },
+        { palavra: "Piquenique", dialogo: "Se fôssemos passar uma tarde inteira isolados em um parque, qual música de fundo escolheríamos?" },
         { palavra: "Olhar", dialogo: "Qual expressão ou mania fofa o outro faz sem perceber quando está muito concentrado?" },
         { palavra: "Presente", dialogo: "Qual pequeno gesto ou surpresa boba te fez perceber que estávamos construindo algo gigante?" }
     ];
@@ -644,17 +642,17 @@
     const PALAVRAS_PADRAO = PALAVRAS_PADRAO_OBJ.map(item => item.palavra);
     function getPalavras() { return customWords.length > 0 ? customWords : PALAVRAS_PADRAO; }
 
-    async function salvarPalavras() {
+    function salvarPalavras() {
         try {
-            await window.storage.set("words:" + roomName, JSON.stringify(customWords), true);
+            localStorage.setItem("words:" + roomName, JSON.stringify(customWords));
         } catch(e) { console.warn("Storage save error:", e); }
     }
 
-    async function carregarPalavrasSalvas() {
+    function carregarPalavrasSalvas() {
         try {
-            const result = await window.storage.get("words:" + roomName, true);
-            if (result && result.value) {
-                const salvas = JSON.parse(result.value);
+            const result = localStorage.getItem("words:" + roomName);
+            if (result) {
+                const salvas = JSON.parse(result);
                 if (Array.isArray(salvas) && salvas.length > 0) {
                     salvas.forEach(w => { if (!customWords.includes(w)) customWords.push(w); });
                     addSystemMessage("💾 " + customWords.length + " momentos carregados do histórico da sala!");
@@ -764,10 +762,6 @@
         let pts = Math.ceil((timeLeft / TEMPO_RODADA) * 10);
         return Math.max(1, Math.min(10, pts));
     }
-
-    document.addEventListener("DOMContentLoaded", () => {
-        initCanvasResolution();
-    });
 
     function initCanvasResolution() {
         canvas.width = VIRTUAL_WIDTH; canvas.height = VIRTUAL_HEIGHT;
@@ -1136,13 +1130,14 @@
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('room-id').innerText = "Sala: " + roomName;
         adicionarJogadorLista(username);
+        initCanvasResolution();
         initMqtt();
     }
 
     function initMqtt() {
         baseTopic = "gartic_clone_romantic_2026/" + roomName;
         mqttClient = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
-        mqttClient.on('connect', async () => {
+        mqttClient.on('connect', () => {
             mqttClient.subscribe(baseTopic + "/chat");
             mqttClient.subscribe(baseTopic + "/draw");
             mqttClient.subscribe(baseTopic + "/presence");
@@ -1158,7 +1153,7 @@
             mqttClient.publish(baseTopic + "/chat", identityPayload);
             mqttClient.publish(baseTopic + "/presence", identityPayload);
             
-            await carregarPalavrasSalvas();
+            carregarPalavrasSalvas();
             if (customWords.length > 0) { mqttClient.publish(baseTopic + "/customwords", JSON.stringify({ words: customWords, sender: username })); }
             setTimeout(() => { checkAndAutoStart(); }, 2000);
         });
@@ -1259,8 +1254,7 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         renderScoreboard();
         
-        // VINCULAÇÃO LOGICA DO DIÁLOGO BASEADO NO MOMENTO SORTEADO
-        const matchTema O = PALAVRAS_PADRAO_OBJ.find(item => item.palavra.toLowerCase() === currentWord.toLowerCase());
+        const matchTema = PALAVRAS_PADRAO_OBJ.find(item => item.palavra.toLowerCase() === currentWord.toLowerCase());
         const textoDialogo = matchTema ? matchTema.dialogo : "Aproveitem para conversar sobre as memórias que esse termo traz para vocês!";
         document.getElementById('dialogue-text').innerText = textoDialogo;
 
