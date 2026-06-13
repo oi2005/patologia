@@ -3,19 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Traços do Amor - Realtime MQTT</title>
+    <title>Traços do Amor - Realtime</title>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         :root {
-            --cor-fundo: #fff0f3;
+            --cor-fundo: #fff5f6;
             --cor-painel: #ffffff;
-            --cor-principal: #ff4d6d;
-            --cor-secundaria: #ff758f;
-            --cor-texto: #590d22;
-            --cor-borda: #ffccd5;
-            --cor-fundo-claro: #fff5f7;
+            --cor-principal: #ff5c7c;
+            --cor-texto: #4a0e17;
+            --cor-borda: #ffe3e8;
         }
 
         body {
@@ -32,460 +30,253 @@
             align-items: center; z-index: 1000;
         }
         .login-box {
-            background: white; padding: 30px; border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(255, 77, 109, 0.2);
-            width: 100%; max-width: 400px; text-align: center;
-            border: 2px solid var(--cor-borda);
+            background: white; padding: 25px; border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(255, 92, 124, 0.15);
+            width: 100%; max-width: 360px; text-align: center;
+            border: 1px solid var(--cor-borda);
         }
-        .login-box h2 { color: var(--cor-principal); margin-bottom: 20px; }
+        .login-box h2 { color: var(--cor-principal); margin-bottom: 15px; font-size: 1.5rem; }
         .login-box input {
-            width: 100%; padding: 12px; margin-bottom: 15px;
+            width: 100%; padding: 10px; margin-bottom: 12px;
             border: 2px solid var(--cor-borda); border-radius: 8px;
-            outline: none; font-size: 16px; color: var(--cor-texto);
+            outline: none; font-size: 15px; color: var(--cor-texto);
         }
         .login-box input:focus { border-color: var(--cor-principal); }
         .login-box textarea {
-            width: 100%; padding: 12px; margin-bottom: 15px;
+            width: 100%; padding: 10px; margin-bottom: 12px;
             border: 2px solid var(--cor-borda); border-radius: 8px;
-            outline: none; font-size: 14px; resize: vertical;
-            min-height: 70px; color: var(--cor-texto);
+            outline: none; font-size: 13px; resize: none;
+            min-height: 60px; color: var(--cor-texto);
         }
         .login-box textarea:focus { border-color: var(--cor-principal); }
-        .login-box .hint { font-size: 11px; color: var(--cor-secundaria); margin-top: -10px; margin-bottom: 15px; text-align: left; }
+        .login-box .hint { font-size: 11px; color: #a67c82; margin-top: -8px; margin-bottom: 12px; text-align: left; }
 
         header {
             text-align: center; margin-bottom: 6px; background: white;
-            padding: 8px 16px; border-radius: 50px;
-            box-shadow: 0 4px 6px rgba(255, 77, 109, 0.1);
+            padding: 6px 16px; border-radius: 50px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
             width: 100%; max-width: 1400px;
             display: flex; justify-content: space-between; align-items: center;
             gap: 10px; flex-shrink: 0; position: relative;
             border: 1px solid var(--cor-borda);
         }
-        h1 { color: var(--cor-principal); font-size: 20px; flex-shrink: 0; }
+        h1 { color: var(--cor-principal); font-size: 16px; flex-shrink: 0; }
+        
+        #word-area-wrapper {
+            display: flex; flex-direction: column; flex: 1; align-items: center; gap: 2px;
+        }
         #word-display {
-            font-weight: bold; font-size: 16px; color: var(--cor-texto);
-            background: var(--cor-fundo-claro); padding: 4px 14px; border-radius: 20px;
-            border: 2px dashed var(--cor-principal); text-align: center; word-break: break-word; flex: 1;
+            font-weight: bold; font-size: 15px; color: var(--cor-texto);
+            background: #fff9fa; padding: 4px 14px; border-radius: 20px;
+            border: 1px solid var(--cor-principal); text-align: center; word-break: break-word;
         }
+        #dialogue-text {
+            font-size: 11px; color: #a67c82; font-style: italic; text-align: center;
+        }
+
         #room-display {
-            font-weight: bold; color: var(--cor-texto); font-size: 12px;
+            font-weight: bold; color: var(--cor-texto); font-size: 11px;
             display: flex; flex-direction: column; align-items: flex-end;
-            gap: 2px; flex-shrink: 0;
+            gap: 1px; flex-shrink: 0;
         }
-        #timer-display { font-weight: bold; color: var(--cor-principal); font-size: 14px; }
+        #timer-display { font-weight: bold; color: var(--cor-principal); font-size: 13px; }
 
         .btn-words-toggle {
-            background: var(--cor-principal); color: white; border: none; padding: 6px 12px;
-            border-radius: 20px; font-weight: bold; font-size: 12px; cursor: pointer;
-            display: flex; align-items: center; gap: 4px; transition: background 0.2s;
+            background: #fff; color: var(--cor-principal); border: 1px solid var(--cor-principal); padding: 4px 10px;
+            border-radius: 20px; font-weight: bold; font-size: 11px; cursor: pointer; transition: all 0.2s;
         }
-        .btn-words-toggle:hover { background: var(--cor-secundaria); }
+        .btn-words-toggle:hover { background: var(--cor-fundo); }
         #words-management-panel {
-            position: absolute; top: 55px; left: 16px; background: white;
-            padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(255, 77, 109, 0.2);
-            border: 2px solid var(--cor-principal); z-index: 600; width: 280px; display: none;
-            flex-direction: column; gap: 8px; text-align: left;
+            position: absolute; top: 48px; left: 16px; background: white;
+            padding: 10px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid var(--cor-principal); z-index: 600; width: 260px; display: none;
+            flex-direction: column; gap: 6px; text-align: left;
         }
         #words-management-panel label { font-size: 11px; font-weight: bold; color: var(--cor-texto); }
         #words-management-panel textarea {
-            width: 100%; height: 60px; padding: 6px; font-size: 12px;
+            width: 100%; height: 50px; padding: 6px; font-size: 12px;
             border: 1px solid var(--cor-borda); border-radius: 6px; resize: none; outline: none;
         }
         #words-management-panel textarea:focus { border-color: var(--cor-principal); }
-        #words-management-panel .panel-actions { display: flex; justify-content: flex-end; gap: 6px; }
+        #words-management-panel .panel-actions { display: flex; justify-content: flex-end; gap: 4px; }
 
         #main-container {
             display: flex; width: 100%; max-width: 1400px;
-            flex: 1; gap: 8px; overflow: hidden; min-height: 0;
+            flex: 1; gap: 6px; overflow: hidden; min-height: 0;
         }
 
         #scoreboard {
-            flex: 0 0 150px; background: white; border-radius: 12px; padding: 10px;
-            box-shadow: 0 4px 6px rgba(255, 77, 109, 0.1);
+            flex: 0 0 140px; background: white; border-radius: 8px; padding: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
             display: flex; flex-direction: column; overflow: hidden;
             border: 1px solid var(--cor-borda);
         }
-        #scoreboard h3 { color: var(--cor-texto); padding-bottom: 5px; border-bottom: 2px solid var(--cor-borda); font-size: 14px; }
+        #scoreboard h3 { color: #8c6268; padding-bottom: 4px; border-bottom: 1px solid var(--cor-borda); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
         #players-list {
-            margin-top: 8px; overflow-y: auto; flex: 1;
-            display: flex; flex-direction: column; gap: 5px;
+            margin-top: 6px; overflow-y: auto; flex: 1;
+            display: flex; flex-direction: column; gap: 4px;
         }
         .player-item {
-            background: var(--cor-fundo-claro); padding: 7px 8px; border-radius: 6px;
+            background: var(--cor-fundo); padding: 6px 8px; border-radius: 6px;
             font-weight: bold; color: var(--cor-texto); font-size: 11px;
-            border-left: 4px solid var(--cor-principal);
+            border-left: 3px solid var(--cor-principal);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .player-item.drawing { border-left-color: var(--cor-principal); background: #ffe3e8; }
+        .player-item.drawing { border-left-color: var(--cor-principal); background: #ffebeb; }
         .player-info { display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
-        .player-rank { font-size: 9px; color: var(--cor-secundaria); font-weight: normal; }
+        .player-rank { font-size: 9px; color: #a67c82; font-weight: normal; }
         .player-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .player-score {
-            background: var(--cor-principal); color: white; border-radius: 10px;
-            padding: 1px 7px; font-size: 11px; font-weight: bold;
-            min-width: 32px; text-align: center;
-            transition: transform 0.2s, background 0.3s;
-            flex-shrink: 0;
+            background: var(--cor-principal); color: white; border-radius: 8px;
+            padding: 1px 6px; font-size: 10px; font-weight: bold;
+            min-width: 28px; text-align: center; flex-shrink: 0;
         }
         .player-item.drawing .player-score { background: var(--cor-texto); }
-        .player-score.bump { transform: scale(1.4); background: #38b000 !important; }
+        .player-score.bump { transform: scale(1.2); background: #2a9d8f !important; }
 
         .score-popup {
             position: fixed; pointer-events: none;
-            font-size: 20px; font-weight: bold; color: #38b000;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.25);
-            animation: floatUp 1.4s ease-out forwards; z-index: 9999;
+            font-size: 18px; font-weight: bold; color: #2a9d8f;
+            animation: floatUp 1.2s ease-out forwards; z-index: 9999;
         }
         @keyframes floatUp {
-            0%   { opacity: 1; transform: translateY(0) scale(1); }
-            60%  { opacity: 1; transform: translateY(-40px) scale(1.15); }
-            100% { opacity: 0; transform: translateY(-70px) scale(0.9); }
+            0%   { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
         }
 
         #canvas-container {
-            flex: 1; background: white; border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(255, 77, 109, 0.1);
+            flex: 1; background: white; border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
             display: flex; flex-direction: column; overflow: hidden; position: relative;
             min-width: 0; border: 1px solid var(--cor-borda);
         }
         canvas {
             flex: 1; background: #ffffff; cursor: crosshair;
-            touch-action: none;
-            width: 100%; height: 100%; display: block;
-            -webkit-user-select: none; user-select: none;
+            touch-action: none; width: 100%; height: 100%; display: block;
         }
-        canvas.cursor-eraser { cursor: cell; }
-        canvas.cursor-fill   { cursor: copy; }
 
         #round-announcement {
-            position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) scale(0.5);
-            background: rgba(89, 13, 34, 0.95); color: white;
-            padding: 18px 30px; border-radius: 16px; font-weight: bold; text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4); border: 3px solid var(--cor-principal);
+            position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(74, 14, 23, 0.95); color: white;
+            padding: 12px 24px; border-radius: 8px; font-weight: bold; text-align: center;
             z-index: 500; pointer-events: none; display: none; opacity: 0;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            max-width: 85%; width: max-content;
+            transition: all 0.25s ease-out; max-width: 85%; width: max-content;
         }
         #round-announcement.show { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        #round-announcement h2 { font-size: 22px; color: var(--cor-secundaria); margin-bottom: 4px; }
-        #round-announcement p { font-size: 14px; color: #e6e6e6; font-weight: normal; }
+        #round-announcement h2 { font-size: 18px; color: var(--cor-principal); }
+        #round-announcement p { font-size: 12px; color: #d4bfc2; font-weight: normal; }
 
         #tools {
-            background: var(--cor-fundo-claro);
-            display: flex; flex-direction: column;
-            padding: 8px; gap: 6px;
-            border-right: 3px solid var(--cor-borda);
-            flex-shrink: 0; overflow-y: auto;
-            width: 56px;
+            background: #fff; display: flex; flex-direction: column;
+            padding: 6px; gap: 5px; border-right: 1px solid var(--cor-borda);
+            flex-shrink: 0; overflow-y: auto; width: 50px;
         }
-
-        .tool-section-label {
-            font-size: 8px; color: var(--cor-secundaria); text-transform: uppercase;
-            letter-spacing: 0.5px; text-align: center; margin-top: 2px;
-        }
-
+        .tool-section-label { font-size: 8px; color: #a67c82; text-transform: uppercase; text-align: center; }
         .tool-btn {
-            width: 38px; height: 38px; border-radius: 8px;
-            border: 2px solid transparent; cursor: pointer;
+            width: 36px; height: 36px; border-radius: 6px;
+            border: 1px solid var(--cor-borda); cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            font-size: 16px; background: white;
-            border-color: var(--cor-borda);
-            color: var(--cor-texto); transition: all 0.15s;
-            flex-shrink: 0;
-            -webkit-tap-highlight-color: transparent;
+            font-size: 14px; background: white; color: var(--cor-texto);
         }
-        .tool-btn:hover { background: var(--cor-fundo); border-color: var(--cor-principal); }
-        .tool-btn.active { background: var(--cor-principal); color: white; border-color: var(--cor-texto); }
+        .tool-btn.active { background: var(--cor-principal); color: white; border-color: var(--cor-principal); }
 
-        .brush-sizes {
-            display: flex; flex-direction: column; gap: 4px; align-items: center;
-        }
-        .size-btn {
-            cursor: pointer; border-radius: 50%; background: var(--cor-texto);
-            border: 2px solid #555; transition: border-color 0.15s, transform 0.1s;
-            flex-shrink: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .size-btn:hover { border-color: var(--cor-principal); transform: scale(1.15); }
-        .size-btn.active { border-color: var(--cor-principal); box-shadow: 0 0 0 2px rgba(255, 77, 109, 0.5); }
+        .brush-sizes { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+        .size-btn { cursor: pointer; border-radius: 50%; background: var(--cor-texto); border: 1px solid #fff; }
+        .size-btn.active { box-shadow: 0 0 0 2px var(--cor-principal); }
 
-        .tool-separator { height: 1px; background: var(--cor-borda); margin: 3px 0; }
+        .tool-separator { height: 1px; background: var(--cor-borda); margin: 2px 0; }
 
         #palette-container {
-            flex: 0 0 46px; background: var(--cor-fundo-claro); border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            display: flex; flex-direction: column; overflow: hidden;
-            padding: 6px 4px; gap: 4px; border: 1px solid var(--cor-borda);
+            flex: 0 0 42px; background: #fff; border-radius: 8px;
+            display: flex; flex-direction: column; padding: 4px; gap: 2px; border: 1px solid var(--cor-borda);
         }
-        #palette-label { font-size: 8px; color: var(--cor-texto); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
-        #palette-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 4px; overflow-y: auto; flex: 1;
-        }
-        #palette-grid::-webkit-scrollbar { width: 3px; }
-        #palette-grid::-webkit-scrollbar-track { background: transparent; }
-        #palette-grid::-webkit-scrollbar-thumb { background: var(--cor-borda); border-radius: 2px; }
-
-        .color-swatch {
-            width: 18px; height: 18px; border-radius: 4px;
-            cursor: pointer; border: 2px solid transparent;
-            transition: transform 0.1s, border-color 0.1s;
-            flex-shrink: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .color-swatch:hover { transform: scale(1.2); border-color: white; }
-        .color-swatch.active { border-color: var(--cor-texto); transform: scale(1.15); box-shadow: 0 0 0 1px var(--cor-principal); }
-
-        #color-custom { width: 100%; height: 22px; border: none; border-radius: 4px; cursor: pointer; padding: 0; flex-shrink: 0; }
-        #current-color-display {
-            width: 36px; height: 36px; border-radius: 8px;
-            border: 3px solid white; flex-shrink: 0;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3); align-self: center;
-        }
+        #palette-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; overflow-y: auto; flex: 1; }
+        .color-swatch { width: 16px; height: 16px; border-radius: 3px; cursor: pointer; border: 1px solid transparent; }
+        .color-swatch.active { border-color: var(--cor-texto); box-shadow: 0 0 0 1px var(--cor-principal); }
+        #color-custom { width: 100%; height: 20px; border: none; border-radius: 3px; cursor: pointer; }
 
         #bottom-actions {
             display: flex; gap: 6px; padding: 4px 8px;
-            background: var(--cor-fundo-claro); border-top: 2px solid var(--cor-borda);
-            align-items: center; flex-shrink: 0;
+            background: white; border-top: 1px solid var(--cor-borda); align-items: center; flex-shrink: 0;
         }
-        .btn { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
-        .btn-clear { background: #6c757d; color: white; }
-        .btn-skip { background: #f4a261; color: white; display: none; }
+        .btn { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; }
+        .btn-clear { background: #e2e3e5; color: #383d41; }
+        .btn-skip { background: #fff3cd; color: #856404; display: none; }
         
         .action-interact-btn {
-            color: white; font-size: 13px; padding: 5px 10px; border-radius: 7px; border: none; cursor: pointer; font-weight: bold; flex-shrink: 0; display: none; transition: transform 0.1s, background 0.2s; box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-            -webkit-tap-highlight-color: transparent;
+            color: white; font-size: 11px; padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        #btn-egg { background: #f72585; }
-        #btn-egg:active { transform: scale(0.92); background: #b5179e; }
+        #btn-egg { background: #ff758f; }
         #btn-flower { background: #ff4d6d; }
-        #btn-flower:active { transform: scale(0.92); background: #cc2a49; }
         .action-interact-btn.cooldown { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
         .egg-fly, .flower-fly {
-            position: fixed; font-size: 36px; pointer-events: none; z-index: 9999;
-            animation: itemFly var(--duration, 0.9s) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            position: fixed; font-size: 28px; pointer-events: none; z-index: 9999;
+            animation: itemFly var(--duration, 0.8s) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
         @keyframes itemFly {
-            0%   { opacity: 1; transform: translate(0,0) rotate(0deg) scale(1); }
-            70%  { opacity: 1; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(1.1); }
-            85%  { opacity: 1; transform: translate(var(--tx2), var(--ty2)) rotate(var(--rot)) scale(1.3); }
-            100% { opacity: 0; transform: translate(var(--tx2), var(--ty2)) rotate(var(--rot)) scale(0.5); }
+            0%   { opacity: 1; transform: translate(0,0); }
+            100% { opacity: 0; transform: translate(var(--tx2), var(--ty2)); }
         }
-        .egg-splash, .flower-splash { position: fixed; font-size: 48px; pointer-events: none; z-index: 9999; animation: itemSplash 0.8s ease-out forwards; }
-        @keyframes itemSplash {
-            0%   { opacity: 1; transform: scale(0.5); }
-            40%  { opacity: 1; transform: scale(1.6); }
-            100% { opacity: 0; transform: scale(2.2); }
-        }
-        @keyframes screenShake {
-            0%  { transform: translate(0,0); }
-            15% { transform: translate(-6px, 3px); }
-            30% { transform: translate(6px, -3px); }
-            45% { transform: translate(-4px, 4px); }
-            60% { transform: translate(4px, -2px); }
-            75% { transform: translate(-2px, 2px); }
-            100%{ transform: translate(0,0); }
-        }
-        .shake { animation: screenShake 0.45s ease; }
-        #egg-overlay { position: fixed; inset: 0; pointer-events: none; background: rgba(255, 77, 109, 0.2); opacity: 0; z-index: 9998; transition: opacity 0.1s; }
-        #egg-overlay.splat { animation: splatFade 1.2s ease-out forwards; }
-        @keyframes splatFade { 0% { opacity: 0.7; } 100% { opacity: 0; } }
-        .petal-particle { position: fixed; pointer-events: none; font-size: 18px; z-index: 9997; animation: petalFall var(--fall-duration, 2s) linear forwards; }
+        .egg-splash, .flower-splash { position: fixed; font-size: 32px; pointer-events: none; z-index: 9999; animation: itemSplash 0.6s ease-out forwards; }
+        @keyframes itemSplash { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+        
+        #egg-overlay { position: fixed; inset: 0; pointer-events: none; background: rgba(255, 92, 124, 0.1); opacity: 0; z-index: 9998; }
+        #egg-overlay.splat { animation: splatFade 1s ease-out forwards; }
+        @keyframes splatFade { 0% { opacity: 1; } 100% { opacity: 0; } }
+        
+        .petal-particle { position: fixed; pointer-events: none; font-size: 14px; z-index: 9997; animation: petalFall var(--fall-duration, 1.8s) linear forwards; }
         @keyframes petalFall {
-            0% { transform: translateY(-20px) translateX(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(105vh) translateX(var(--drift, 50px)) rotate(360deg); opacity: 0; }
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(105vh) translateX(var(--drift, 40px)) rotate(360deg); opacity: 0; }
         }
 
-        #right-chats-wrapper {
-            flex: 0 0 240px; display: flex; flex-direction: column; gap: 8px; overflow: hidden;
-        }
-        .chat-box-container {
-            flex: 1; background: white; border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(255, 77, 109, 0.1);
-            display: flex; flex-direction: column; overflow: hidden;
-            border: 1px solid var(--cor-borda);
-        }
-        .chat-title-bar { background: var(--cor-texto); color: white; padding: 4px 8px; font-size: 11px; font-weight: bold; text-transform: uppercase; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-        .chat-messages-area { flex: 1; padding: 8px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-        .msg { padding: 4px 6px; border-radius: 5px; font-size: 11px; word-break: break-all; line-height: 1.3; }
-        .msg-system  { background: #ffe5ec; color: var(--cor-principal); font-weight: bold; }
-        .msg-success { background: #d1e7dd; color: #0f5132; font-weight: bold; border: 1px solid #badbcc; }
-        .msg-wrong   { background: var(--cor-fundo-claro); color: var(--cor-texto); }
-        .msg-normal  { background: #f8f9fa; color: #333; }
+        #right-chats-wrapper { flex: 0 0 230px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+        .chat-box-container { flex: 1; background: white; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--cor-borda); }
+        .chat-title-bar { background: var(--cor-fundo); color: var(--cor-texto); padding: 4px 10px; font-size: 10px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid var(--cor-borda); }
+        .chat-messages-area { flex: 1; padding: 6px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
+        .msg { padding: 3px 6px; border-radius: 4px; font-size: 11px; word-break: break-all; line-height: 1.2; }
+        .msg-system  { background: #fff0f2; color: var(--cor-principal); font-weight: bold; }
+        .msg-success { background: #e2f0d9; color: #385723; font-weight: bold; }
+        .msg-wrong   { background: #f8f9fa; color: #6c757d; }
+        .msg-normal  { background: #fdfdfd; color: #333; border: 1px solid #f1f1f1; }
         .msg-normal .username { font-weight: bold; color: var(--cor-principal); }
-        .msg-egg     { background: #fff0f3; color: var(--cor-texto); font-weight: bold; border: 1px solid var(--cor-borda); }
-        .msg-flower  { background: #ffe5ec; color: var(--cor-principal); font-weight: bold; border: 1px solid var(--cor-borda); }
-        .chat-input-row { display: flex; padding: 5px; border-top: 1px solid #dee2e6; background: #f8f9fa; flex-shrink: 0; }
-        .chat-input-field { flex: 1; padding: 6px; border: 2px solid var(--cor-borda); border-radius: 5px; outline: none; font-size: 12px; }
-        .chat-send-btn { background: var(--cor-principal); color: white; margin-left: 4px; font-size: 11px; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
-        #dialogue-trigger-panel {
-            background: linear-gradient(135deg, #fff0f3, #ffe5ec);
-            border: 2px solid var(--cor-borda);
-            border-radius: 12px;
-            padding: 10px;
-            margin-bottom: 6px;
-            font-size: 12px;
-            line-height: 1.4;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            width: 100%;
-            max-width: 1400px;
-            box-shadow: 0 4px 6px rgba(255,77,109,0.05);
-            flex-shrink: 0;
-        }
-        #dialogue-trigger-panel strong { color: var(--cor-principal); font-size: 11px; text-transform: uppercase; }
+        
+        .chat-input-row { display: flex; padding: 4px; border-top: 1px solid var(--cor-borda); background: #fafafa; }
+        .chat-input-field { flex: 1; padding: 5px; border: 1px solid var(--cor-borda); border-radius: 4px; outline: none; font-size: 11px; }
+        .chat-send-btn { background: var(--cor-principal); color: white; margin-left: 3px; font-size: 11px; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; }
 
         @media (max-width: 768px) {
-            body { padding: 4px; overflow: hidden; }
-
-            header {
-                padding: 5px 8px; margin-bottom: 0;
-                height: 44px; border-radius: 8px; flex-shrink: 0;
-            }
-            h1 { font-size: 11px; }
-            #word-display { font-size: 10px; padding: 2px 6px; }
-            #room-display { font-size: 9px; }
+            body { padding: 4px; }
+            header { padding: 4px 10px; height: 38px; }
+            h1 { font-size: 12px; }
+            #word-display { font-size: 11px; padding: 2px 8px; }
+            #dialogue-text { display: none; }
+            #room-display { font-size: 8px; }
             #timer-display { font-size: 10px; }
-            #words-management-panel { top: 48px; left: 4px; width: 260px; }
-            #dialogue-trigger-panel { font-size: 10px; padding: 6px 10px; }
-
-            #main-container {
-                position: absolute;
-                top: 96px;
-                left: 4px;
-                right: 4px;
-                bottom: 4px;
-                flex-direction: column;
-                gap: 4px;
-                overflow: hidden;
-            }
-
-            #scoreboard {
-                flex: 0 0 36px !important;
-                width: 100%;
-                padding: 3px 6px;
-                border-radius: 6px;
-                flex-direction: row;
-                align-items: center;
-            }
+            
+            #main-container { position: absolute; top: 46px; left: 4px; right: 4px; bottom: 4px; flex-direction: column; gap: 4px; }
+            #scoreboard { flex: 0 0 32px !important; width: 100%; padding: 2px; flex-direction: row; }
             #scoreboard h3 { display: none; }
-            #players-list {
-                margin-top: 0;
-                flex-direction: row !important;
-                overflow-x: auto; overflow-y: hidden;
-                height: 100%;
-                align-items: center;
-                gap: 5px;
-            }
-            .player-item {
-                padding: 3px 6px; font-size: 10px;
-                height: 28px; white-space: nowrap;
-                display: inline-flex; flex-shrink: 0; align-items: center;
-            }
+            #players-list { margin-top: 0; flex-direction: row !important; overflow-x: auto; height: 100%; align-items: center; gap: 4px; }
+            .player-item { padding: 2px 6px; font-size: 9px; height: 24px; }
 
-            #canvas-wrapper {
-                flex: 1 1 0 !important;
-                min-height: 0 !important;
-                display: flex !important;
-                flex-direction: column !important;
-            }
+            #canvas-wrapper, #drawing-area, #canvas-container { flex: 1 1 0 !important; min-height: 0 !important; display: flex !important; flex-direction: column !important; }
+            #canvas { position: absolute !important; top: 0; left: 0; width: 100% !important; height: 100% !important; }
 
-            #drawing-area {
-                flex: 1 1 0 !important;
-                min-height: 0 !important;
-                display: flex !important;
-                flex-direction: column !important;
-            }
+            #tools { width: 100%; flex-direction: row; height: 44px; min-height: 44px; padding: 4px; align-items: center; border-right: none; border-top: 1px solid var(--cor-borda); }
+            .tool-section-label, .tool-separator { display: none; }
+            .brush-sizes { flex-direction: row; gap: 4px; }
+            .tool-btn { width: 32px; height: 32px; font-size: 12px; }
 
-            #canvas-container {
-                flex: 1 1 0 !important;
-                min-height: 0 !important;
-                position: relative !important;
-                overflow: hidden !important;
-            }
+            #palette-container { flex: 0 0 36px !important; width: 100% !important; height: 36px !important; flex-direction: row !important; align-items: center; }
+            #palette-grid { grid-template-columns: repeat(14, 18px); overflow-x: auto; height: 24px; gap: 2px; }
+            .color-swatch { width: 18px; height: 18px; }
+            #color-custom { width: 22px; height: 22px; }
 
-            #canvas {
-                position: absolute !important;
-                top: 0 !important; left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-            }
-
-            #tools {
-                width: 100%;
-                flex-direction: row;
-                overflow-x: auto; overflow-y: hidden;
-                border-right: none;
-                border-top: 2px solid var(--cor-borda);
-                height: 50px;
-                min-height: 50px;
-                padding: 6px 10px;
-                align-items: center;
-                gap: 8px;
-                flex-shrink: 0 !important;
-            }
-            .tool-section-label { display: none; }
-            .tool-separator { width: 1px; height: 32px; background: var(--cor-borda); margin: 0 2px; flex-shrink: 0; }
-            .brush-sizes { flex-direction: row; gap: 6px; align-items: center; }
-            .tool-btn { width: 38px; height: 38px; font-size: 17px; flex-shrink: 0; }
-            .size-btn { flex-shrink: 0; }
-
-            #palette-container {
-                flex: 0 0 42px !important;
-                width: 100% !important;
-                height: 42px !important;
-                flex-direction: row !important;
-                padding: 5px 8px;
-                gap: 6px;
-                border-radius: 8px;
-                align-items: center;
-                flex-shrink: 0 !important;
-            }
-            #palette-label { display: none; }
-            #palette-grid {
-                grid-template-columns: repeat(14, 22px);
-                overflow-x: auto; overflow-y: hidden;
-                height: 28px;
-                gap: 3px;
-                flex: 1;
-            }
-            .color-swatch { width: 22px; height: 22px; border-radius: 4px; }
-            #current-color-display { width: 28px; height: 28px; flex-shrink: 0; }
-            #color-custom { width: 26px; height: 26px; border-radius: 4px; flex-shrink: 0; }
-
-            #bottom-actions { padding: 3px 6px; flex-wrap: wrap; gap: 4px; }
-
-            #right-chats-wrapper {
-                flex: 0 0 150px !important;
-                width: 100% !important;
-                flex-direction: row !important;
-                gap: 4px;
-                flex-shrink: 0 !important;
-            }
-            .chat-box-container { flex: 1; min-width: 0; }
-            .chat-messages-area { font-size: 10px; padding: 5px; }
-            .chat-input-field { font-size: 11px; padding: 4px; }
+            #right-chats-wrapper { flex: 0 0 120px !important; width: 100% !important; flex-direction: row !important; gap: 4px; }
         }
-
-        #canvas-wrapper {
-            flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0;
-        }
-        #drawing-area {
-            flex: 1; display: flex; flex-direction: row; overflow: hidden; min-height: 0;
-        }
-        #canvas-container { flex: 1; position: relative; min-height: 0; }
-
-        #fill-status {
-            display: none;
-            position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.7); color: white;
-            padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
-            pointer-events: none; z-index: 10;
-        }
+        #fill-status { display: none; }
     </style>
 </head>
 <body>
@@ -495,111 +286,98 @@
 <div id="login-screen">
     <div class="login-box">
         <h2>❤️ Traços do Amor</h2>
-        <input type="text" id="input-username" placeholder="👤 Seu Nome ou Apelido" required>
-        <input type="text" id="input-room" placeholder="🔑 Código da Sala Secreta" required>
-        <textarea id="input-custom-words" placeholder="📝 Lembranças customizadas (opcional)&#10;Ex: Primeiro beijo, Cinema, Sorvete..."></textarea>
-        <p class="hint">Separe por vírgula. Se deixar em branco, usaremos nosso banco de memórias românticas.</p>
-        <button class="btn" style="width:100%;padding:12px;font-size:16px;background:var(--cor-principal);color:white;" onclick="connectToGame()">🚀 ENTRAR NA SALA</button>
+        <input type="text" id="input-username" placeholder="👤 Seu Nome" required>
+        <input type="text" id="input-room" placeholder="🔑 Código da Sala" required>
+        <textarea id="input-custom-words" placeholder="📝 Temas customizados (opcional)&#10;Ex: Cinema, Viagem, Praia..."></textarea>
+        <p class="hint">Separe por vírgula. Ou deixe em branco para usar os temas padrão.</p>
+        <button class="btn" style="width:100%;padding:10px;font-size:15px;background:var(--cor-principal);color:white;" onclick="connectToGame()">Jogar ✨</button>
     </div>
 </div>
 
 <header>
-    <h1>❤️ NOSSO MOMENTO</h1>
-    <button class="btn-words-toggle" onclick="toggleWordsPanel()">📝 Momentos</button>
+    <h1>❤️ JOGO</h1>
+    <div id="word-area-wrapper">
+        <div id="word-display">⏳ Esperando conexão...</div>
+        <div id="dialogue-text">Conectando sintonia...</div>
+    </div>
+    <button class="btn-words-toggle" onclick="toggleWordsPanel()">📝 Temas</button>
     <div id="words-management-panel">
-        <label>➕ Adicionar Momentos na Sala:</label>
-        <textarea id="runtime-new-words" placeholder="Ex: Viagem à praia, Jantar romântico (separe por vírgula)"></textarea>
+        <label>➕ Adicionar novos temas:</label>
+        <textarea id="runtime-new-words" placeholder="Ex: Jantar, Café da manhã (separe por vírgula)"></textarea>
         <div class="panel-actions">
-            <button class="btn" style="background:#6c757d; color:white; padding:4px 8px; font-size:11px;" onclick="toggleWordsPanel()">Fechar</button>
-            <button class="btn" style="background:var(--cor-principal); color:white; padding:4px 8px; font-size:11px;" onclick="submitRuntimeWords()">Injetar</button>
+            <button class="btn" style="background:#e2e3e5; color:#383d41; padding:3px 6px;" onclick="toggleWordsPanel()">Fechar</button>
+            <button class="btn" style="background:var(--cor-principal); color:white; padding:3px 6px;" onclick="submitRuntimeWords()">Injetar</button>
         </div>
     </div>
-    <div id="word-display">⏳ Esperando a conexão se estabelecer...</div>
     <div id="room-display">
         <span id="room-id">Sala: —</span>
-        <span id="timer-display">⏱️ Tempo: --</span>
+        <span id="timer-display">⏱️ --</span>
     </div>
 </header>
 
-<div id="dialogue-trigger-panel">
-    <strong>Gatilho de Conversa 💬</strong>
-    <span id="dialogue-text">Aguardando o início da rodada para sintonizar os corações...</span>
-</div>
-
 <div id="main-container">
     <div id="scoreboard">
-        <h3>🏆 Pontuação</h3>
+        <h3>🏆 Placar</h3>
         <div id="players-list"></div>
     </div>
 
     <div id="canvas-wrapper">
         <div id="drawing-area">
             <div id="tools">
-                <span class="tool-section-label">Estilo</span>
-                <div class="tool-btn active" id="tool-brush" title="Pincel Macio" onclick="setTool('brush')">✏️</div>
-                <div class="tool-btn" id="tool-eraser" title="Apagar Traço" onclick="setTool('eraser')">🧹</div>
-                <div class="tool-btn" id="tool-fill" title="Balde de Tinta" onclick="setTool('fill')">🪣</div>
-
+                <div class="tool-btn active" id="tool-brush" title="Pincel" onclick="setTool('brush')">✏️</div>
+                <div class="tool-btn" id="tool-eraser" title="Borracha" onclick="setTool('eraser')">🧹</div>
+                <div class="tool-btn" id="tool-fill" title="Balde" onclick="setTool('fill')">🪣</div>
                 <div class="tool-separator"></div>
-                <span class="tool-section-label">Curvas</span>
-                <div class="tool-btn active" id="shape-free" title="Movimento Livre" onclick="setShape('free')">〰️</div>
-                <div class="tool-btn" id="shape-circle" title="Forma Redonda" onclick="setShape('circle')">⭕</div>
-                <div class="tool-btn" id="shape-square" title="Forma Quadrada" onclick="setShape('square')">⬜</div>
-                <div class="tool-btn" id="shape-triangle" title="Forma Pontuda" onclick="setShape('triangle')">🔺</div>
-                <div class="tool-btn" id="shape-spray" title="Spray Borrifador" onclick="setShape('spray')">💨</div>
-
+                <div class="tool-btn active" id="shape-free" title="Livre" onclick="setShape('free')">〰️</div>
+                <div class="tool-btn" id="shape-circle" title="Círculo" onclick="setShape('circle')">⭕</div>
+                <div class="tool-btn" id="shape-square" title="Quadrado" onclick="setShape('square')">⬜</div>
+                <div class="tool-btn" id="shape-spray" title="Spray" onclick="setShape('spray')">💨</div>
                 <div class="tool-separator"></div>
-                <span class="tool-section-label">Calibre</span>
                 <div class="brush-sizes">
-                    <div class="size-btn active" id="size-2" style="width:8px;height:8px;" title="Fininho" onclick="setBrushSize(2,this)"></div>
-                    <div class="size-btn" id="size-5" style="width:12px;height:12px;" title="Delicado" onclick="setBrushSize(5,this)"></div>
-                    <div class="size-btn" id="size-10" style="width:18px;height:18px;" title="Generoso" onclick="setBrushSize(10,this)"></div>
-                    <div class="size-btn" id="size-20" style="width:24px;height:24px;" title="Espesso" onclick="setBrushSize(20,this)"></div>
-                    <div class="size-btn" id="size-40" style="width:32px;height:32px;" title="Preenchimento" onclick="setBrushSize(40,this)"></div>
+                    <div class="size-btn active" id="size-2" style="width:6px;height:6px;" onclick="setBrushSize(2,this)"></div>
+                    <div class="size-btn" id="size-6" style="width:10px;height:10px;" onclick="setBrushSize(6,this)"></div>
+                    <div class="size-btn" id="size-14" style="width:14px;height:14px;" onclick="setBrushSize(14,this)"></div>
+                    <div class="size-btn" id="size-30" style="width:20px;height:20px;" onclick="setBrushSize(30,this)"></div>
                 </div>
-
                 <div class="tool-separator"></div>
-                <div id="current-color-display" style="background:#000000;" title="Cor atual"></div>
+                <div id="current-color-display" style="background:#000000;"></div>
             </div>
 
             <div id="canvas-container">
                 <div id="round-announcement">
-                    <h2 id="announcement-title">FIM DA RODADA</h2>
-                    <p id="announcement-desc">Nossa memória revelada</p>
+                    <h2 id="announcement-title">-</h2>
+                    <p id="announcement-desc">-</p>
                 </div>
                 <canvas id="canvas"></canvas>
-                <div id="fill-status">🪣 Modo Preenchimento Completo</div>
             </div>
         </div>
         <div id="bottom-actions">
-            <button class="btn btn-clear" onclick="sendClear()">🗑️ Limpar Tela</button>
-            <button id="btn-skip" class="btn btn-skip" onclick="skipRound()">⏭️ Passar a Vez</button>
-            <button id="btn-egg" class="action-interact-btn" onclick="throwInteractItem('egg')">❤️ Jogar Coração!</button>
-            <button id="btn-flower" class="action-interact-btn" onclick="throwInteractItem('flower')">💋 Mandar Beijo!</button>
+            <button class="btn btn-clear" onclick="sendClear()">🗑️ Limpar</button>
+            <button id="btn-skip" class="btn btn-skip" onclick="skipRound()">⏭️ Pular</button>
+            <button id="btn-egg" class="action-interact-btn" onclick="throwInteractItem('egg')">❤️ Coração</button>
+            <button id="btn-flower" class="action-interact-btn" onclick="throwInteractItem('flower')">💋 Beijo</button>
         </div>
     </div>
 
     <div id="palette-container">
-        <span id="palette-label">🎨 Paleta</span>
         <div id="palette-grid"></div>
-        <input type="color" id="color-custom" value="#000000" title="Cor customizada" onchange="pickCustomColor(this)">
-        <div id="current-color-display-palette" style="width:30px;height:30px;border-radius:6px;border:2px solid white;flex-shrink:0;background:#000000;"></div>
+        <input type="color" id="color-custom" value="#000000" onchange="pickCustomColor(this)">
     </div>
 
     <div id="right-chats-wrapper">
         <div class="chat-box-container">
-            <div class="chat-title-bar">🎯 Palpites de Lembranças</div>
+            <div class="chat-title-bar">🎯 Palpites</div>
             <div id="guess-messages" class="chat-messages-area"></div>
             <div class="chat-input-row">
-                <input type="text" id="guess-input" class="chat-input-field" placeholder="Adivinhe o momento..." autocomplete="off">
+                <input type="text" id="guess-input" class="chat-input-field" placeholder="Chute aqui..." autocomplete="off">
                 <button class="chat-send-btn" onclick="sendGuessMessage()">➤</button>
             </div>
         </div>
         <div class="chat-box-container">
-            <div class="chat-title-bar">💬 Conversa Sincronizada</div>
+            <div class="chat-title-bar">💬 Conversa</div>
             <div id="chat-messages" class="chat-messages-area"></div>
             <div class="chat-input-row">
-                <input type="text" id="chat-input" class="chat-input-field" placeholder="Digite uma mensagem..." autocomplete="off">
+                <input type="text" id="chat-input" class="chat-input-field" placeholder="Conversar..." autocomplete="off">
                 <button class="chat-send-btn" onclick="sendChatMessage()">➤</button>
             </div>
         </div>
@@ -624,28 +402,26 @@
     let eggCooldown = false, flowerCooldown = false;
     let customWords = [];
     let gameEnded = false;
-    const PONTUACAO_MAXIMA = 100;
+    const PONTUACAO_MAXIMA = 80;
     
     const PALAVRAS_PADRAO_OBJ = [
-        { palavra: "Primeiro Beijo", dialogo: "Quem deu o primeiro passo nesse dia e o que você sentiu exatamente um segundo antes?" },
-        { palavra: "Cinema", dialogo: "Qual foi o primeiro filme ou série que assistimos coladinhos e quem dormiu no meio?" },
-        { palavra: "Viagem", dialogo: "Qual foi o perrengue mais engraçado ou a risada mais descontrolada que demos juntos nessa aventura?" },
-        { palavra: "Sorvete", dialogo: "Se nosso romance fosse um sabor de doce, seria mais doce, azedo ou cheio de misturas?" },
-        { palavra: "Abraço", dialogo: "Qual o melhor momento do dia para receber aquele abraço que zera todos os problemas do mundo?" },
-        { palavra: "Café da Manhã", dialogo: "Quem é mais provável de acordar primeiro e preparar uma surpresa gostosa na cama?" },
-        { palavra: "Alianças", dialogo: "Se pudéssemos escolher qualquer lugar do universo para celebrar nossa união, onde seria?" },
-        { palavra: "Piquenique", dialogo: "Se fôssemos passar uma tarde inteira isolados em um parque, qual música de fundo escolheríamos?" },
-        { palavra: "Olhar", dialogo: "Qual expressão ou mania fofa o outro faz sem perceber quando está muito concentrado?" },
-        { palavra: "Presente", dialogo: "Qual pequeno gesto ou surpresa boba te fez perceber que estávamos construindo algo gigante?" }
+        { palavra: "Primeiro Beijo", dialogo: "Quem deu o primeiro passo nesse dia?" },
+        { palavra: "Cinema", dialogo: "Qual foi o primeiro filme que assistimos juntos?" },
+        { palavra: "Viagem", dialogo: "Lembra qual foi o perrengue mais engraçado desse dia?" },
+        { palavra: "Sorvete", dialogo: "Qual doce ou prato mais lembra o nosso namoro?" },
+        { palavra: "Abraço", dialogo: "Um abraço apertado cura qualquer dia ruim." },
+        { palavra: "Café", dialogo: "Quem é mais provável de levar café na cama?" },
+        { palavra: "Alianças", dialogo: "Onde você gostaria de comemorar nossa próxima data importante?" },
+        { palavra: "Piquenique", dialogo: "Um dia perfeito ao ar livre." },
+        { palavra: "Olhar", dialogo: "Qual mania boba o outro faz quando está concentrado?" },
+        { palavra: "Presente", dialogo: "O melhor presente é o tempo que passamos juntos." }
     ];
 
     const PALAVRAS_PADRAO = PALAVRAS_PADRAO_OBJ.map(item => item.palavra);
     function getPalavras() { return customWords.length > 0 ? customWords : PALAVRAS_PADRAO; }
 
     function salvarPalavras() {
-        try {
-            localStorage.setItem("words:" + roomName, JSON.stringify(customWords));
-        } catch(e) { console.warn("Storage save error:", e); }
+        try { localStorage.setItem("words:" + roomName, JSON.stringify(customWords)); } catch(e) {}
     }
 
     function carregarPalavrasSalvas() {
@@ -655,10 +431,10 @@
                 const salvas = JSON.parse(result);
                 if (Array.isArray(salvas) && salvas.length > 0) {
                     salvas.forEach(w => { if (!customWords.includes(w)) customWords.push(w); });
-                    addSystemMessage("💾 " + customWords.length + " momentos carregados do histórico da sala!");
+                    addSystemMessage("📢 " + customWords.length + " temas customizados carregados do histórico!");
                 }
             }
-        } catch(e) { }
+        } catch(e) {}
     }
 
     let currentTool = 'brush';
@@ -689,14 +465,11 @@
     function setTool(tool) {
         if (gameEnded) return;
         currentTool = tool;
-        document.querySelectorAll('#tools .tool-btn[id^="tool-"]').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#tools .tool-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('tool-' + tool).classList.add('active');
-        const c = document.getElementById('canvas');
-        c.className = '';
-        if (tool === 'eraser') { c.classList.add('cursor-eraser'); setShape('free'); }
-        else if (tool === 'fill') { c.classList.add('cursor-fill'); }
+        if (tool === 'eraser') { setShape('free'); }
+        else if (tool === 'fill') { }
         else { document.getElementById('shape-' + currentShape).classList.add('active'); }
-        document.getElementById('fill-status').style.display = tool === 'fill' ? 'block' : 'none';
     }
 
     function setShape(shape) {
@@ -717,7 +490,6 @@
     function setActiveColor(hex) {
         currentColor = hex;
         document.getElementById('current-color-display').style.background = hex;
-        document.getElementById('current-color-display-palette').style.background = hex;
         document.getElementById('color-custom').value = hex;
         document.querySelectorAll('.color-swatch').forEach(s => {
             s.classList.toggle('active', s.dataset.color === hex);
@@ -737,7 +509,6 @@
             swatch.className = 'color-swatch';
             swatch.dataset.color = hex;
             swatch.style.background = hex;
-            swatch.title = hex;
             if (hex === currentColor) swatch.classList.add('active');
             swatch.addEventListener('click', () => {
                 setActiveColor(hex);
@@ -762,6 +533,8 @@
         let pts = Math.ceil((timeLeft / TEMPO_RODADA) * 10);
         return Math.max(1, Math.min(10, pts));
     }
+
+    document.addEventListener("DOMContentLoaded", () => { initCanvasResolution(); });
 
     function initCanvasResolution() {
         canvas.width = VIRTUAL_WIDTH; canvas.height = VIRTUAL_HEIGHT;
@@ -794,8 +567,7 @@
 
     canvas.addEventListener('touchstart', (e) => {
         if (!isDrawer || !roundActive || gameEnded) return;
-        e.preventDefault();
-        if (e.touches.length !== 1) return;
+        e.preventDefault(); if (e.touches.length !== 1) return;
         const touch = e.touches[0];
         const c = getCanvasCoordinates(touch.clientX, touch.clientY);
         if (currentTool === 'fill') { doFill(Math.round(c.x), Math.round(c.y)); return; }
@@ -804,34 +576,22 @@
 
     canvas.addEventListener('touchmove', (e) => {
         if (!drawing || gameEnded) return;
-        e.preventDefault();
-        if (e.touches.length !== 1) return;
+        e.preventDefault(); if (e.touches.length !== 1) return;
         const touch = e.touches[0];
         const c = getCanvasCoordinates(touch.clientX, touch.clientY);
         onMoveDrag(c.x, c.y);
     }, { passive: false });
 
-    canvas.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        onStopDrag();
-    }, { passive: false });
-
-    canvas.addEventListener('touchcancel', (e) => {
-        e.preventDefault();
-        onStopDrag();
-    }, { passive: false });
+    canvas.addEventListener('touchend', (e) => { e.preventDefault(); onStopDrag(); }, { passive: false });
 
     function onStartDrag(x, y) {
-        drawing = true;
-        startX = x; startY = y;
+        drawing = true; startX = x; startY = y;
         const col = currentTool === 'eraser' ? '#ffffff' : currentColor;
         ctx.fillStyle = col; ctx.strokeStyle = col; ctx.lineWidth = currentBrushSize;
         if (currentShape === 'free') {
             ctx.beginPath(); ctx.moveTo(x, y);
             sendDrawData('start', x, y, col, currentBrushSize);
-        } else {
-            snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        }
+        } else { snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height); }
     }
 
     function onMoveDrag(x, y) {
@@ -867,9 +627,8 @@
         ctx.strokeStyle = color; ctx.fillStyle = "transparent"; ctx.lineWidth = size;
         lastFormCoordinates = { shape, sX, sY, cX, cY };
         ctx.beginPath();
-        if (shape === 'square') {
-            ctx.strokeRect(sX, sY, cX - sX, cY - sY);
-        } else if (shape === 'circle') {
+        if (shape === 'square') { ctx.strokeRect(sX, sY, cX - sX, cY - sY); }
+        else if (shape === 'circle') {
             let rx = (cX - sX) / 2; let ry = (cY - sY) / 2;
             let cx = sX + rx; let cy = sY + ry;
             ctx.save(); ctx.translate(cx, cy); ctx.scale(Math.abs(rx), Math.abs(ry)); ctx.arc(0, 0, 1, 0, 2 * Math.PI); ctx.restore(); ctx.stroke();
@@ -879,40 +638,30 @@
     }
 
     function generateSpray(x, y, color, size) {
-        ctx.fillStyle = color;
-        const density = size * 4;
+        ctx.fillStyle = color; const density = size * 4;
         for (let i = 0; i < density; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const radius = Math.random() * (size * 3);
+            const angle = Math.random() * Math.PI * 2; const radius = Math.random() * (size * 3);
             ctx.fillRect(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius, 1, 1);
         }
     }
 
     function doFill(startX, startY) {
         if (!isDrawer || !roundActive || gameEnded) return;
-        const fillColor = currentColor;
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-        const idx = (startY * canvas.width + startX) * 4;
+        const fillColor = currentColor; const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data; const idx = (startY * canvas.width + startX) * 4;
         const targetR = data[idx], targetG = data[idx+1], targetB = data[idx+2], targetA = data[idx+3];
         const fillR = parseInt(fillColor.slice(1,3),16), fillG = parseInt(fillColor.slice(3,5),16), fillB = parseInt(fillColor.slice(5,7),16);
         if (targetR === fillR && targetG === fillG && targetB === fillB) return;
-        const stack = [[startX, startY]];
-        const visited = new Uint8Array(canvas.width * canvas.height);
+        const stack = [[startX, startY]]; const visited = new Uint8Array(canvas.width * canvas.height);
         function match(i) { return Math.abs(data[i]-targetR)<32 && Math.abs(data[i+1]-targetG)<32 && Math.abs(data[i+2]-targetB)<32 && Math.abs(data[i+3]-targetA)<32; }
         while (stack.length) {
-            const [x, y] = stack.pop();
-            if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
-            const vi = y * canvas.width + x;
-            if (visited[vi]) continue;
-            const pi = vi * 4;
-            if (!match(pi)) continue;
-            visited[vi] = 1;
+            const [x, y] = stack.pop(); if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
+            const vi = y * canvas.width + x; if (visited[vi]) continue;
+            const pi = vi * 4; if (!match(pi)) continue; visited[vi] = 1;
             data[pi] = fillR; data[pi+1] = fillG; data[pi+2] = fillB; data[pi+3] = 255;
             stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
         }
-        ctx.putImageData(imageData, 0, 0);
-        sendDrawData('fill', startX, startY, fillColor, 0);
+        ctx.putImageData(imageData, 0, 0); sendDrawData('fill', startX, startY, fillColor, 0);
     }
 
     function renderRemoteDraw(data) {
@@ -926,193 +675,121 @@
             ctx.fillStyle = "transparent"; ctx.beginPath();
             if (data.shapeType === 'square') { ctx.strokeRect(data.x, data.y, data.endX - data.x, data.endY - data.y); }
             else if (data.shapeType === 'circle') {
-                let rx = (data.endX - data.x) / 2; let ry = (data.endY - data.y) / 2;
-                let cx = data.x + rx; let cy = data.y + ry;
+                let rx = (data.endX - data.x) / 2; let ry = (data.endY - data.y) / 2; let cx = data.x + rx; let cy = data.y + ry;
                 ctx.save(); ctx.translate(cx, cy); ctx.scale(Math.abs(rx), Math.abs(ry)); ctx.arc(0, 0, 1, 0, 2 * Math.PI); ctx.restore(); ctx.stroke();
-            } else if (data.shapeType === 'triangle') {
-                ctx.moveTo(data.x + (data.endX - data.x) / 2, data.y); ctx.lineTo(data.endX, data.endY); ctx.lineTo(data.x, data.endY); ctx.closePath(); ctx.stroke();
-            }
+            } else if (data.shapeType === 'triangle') { ctx.moveTo(data.x + (data.endX - data.x) / 2, data.y); ctx.lineTo(data.endX, data.endY); ctx.lineTo(data.x, data.endY); ctx.closePath(); ctx.stroke(); }
         }
     }
 
     function doRemoteFill(startX, startY, fillColor) {
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-        const idx = (startY * canvas.width + startX) * 4;
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height); const data = imageData.data; const idx = (startY * canvas.width + startX) * 4;
         const targetR = data[idx], targetG = data[idx+1], targetB = data[idx+2], targetA = data[idx+3];
         const fillR = parseInt(fillColor.slice(1,3),16), fillG = parseInt(fillColor.slice(3,5),16), fillB = parseInt(fillColor.slice(5,7),16);
         if (targetR === fillR && targetG === fillG && targetB === fillB) return;
-        const stack = [[startX, startY]];
-        const visited = new Uint8Array(canvas.width * canvas.height);
+        const stack = [[startX, startY]]; const visited = new Uint8Array(canvas.width * canvas.height);
         function match(i) { return Math.abs(data[i]-targetR)<32 && Math.abs(data[i+1]-targetG)<32 && Math.abs(data[i+2]-targetB)<32 && Math.abs(data[i+3]-targetA)<32; }
         while (stack.length) {
-            const [x, y] = stack.pop();
-            if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
-            const vi = y * canvas.width + x;
-            if (visited[vi]) continue;
-            const pi = vi * 4;
-            if (!match(pi)) continue;
-            visited[vi] = 1;
-            data[pi] = fillR; data[pi+1] = fillG; data[pi+2] = fillB; data[pi+3] = 255;
-            stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+            const [x, y] = stack.pop(); if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
+            const vi = y * canvas.width + x; if (visited[vi]) continue;
+            const pi = vi * 4; if (!match(pi)) continue; visited[vi] = 1;
+            data[pi] = fillR; data[pi+1] = fillG; data[pi+2] = fillB; data[pi+3] = 255; stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
         }
         ctx.putImageData(imageData, 0, 0);
     }
 
     function renderScoreboard() {
-        const container = document.getElementById('players-list');
-        if (!container) return;
-        container.innerHTML = "";
+        const container = document.getElementById('players-list'); if (!container) return; container.innerHTML = "";
         const sortedPlayers = Array.from(listaJogadores).sort((a, b) => (scores[b] || 0) - (scores[a] || 0));
         sortedPlayers.forEach((nome, index) => {
-            const rank = index + 1;
-            let rankLabel = rank + "º";
-            if (rank === 1) rankLabel = "👑 1º";
-            else if (rank === 2) rankLabel = "❤️ 2º";
-            else if (rank === 3) rankLabel = "💋 3º";
-            const item = document.createElement('div');
-            item.className = "player-item";
-            item.id = "p-" + nome.replace(/\s+/g,'-');
+            const rank = index + 1; let rankLabel = rank + "º";
+            if (rank === 1) rankLabel = "🥇 1º"; else if (rank === 2) rankLabel = "🥈 2º";
+            const item = document.createElement('div'); item.className = "player-item"; item.id = "p-" + nome.replace(/\s+/g,'-');
             if (nome === currentDrawerName) item.classList.add('drawing');
             const infoDiv = document.createElement('div'); infoDiv.className = 'player-info';
             const rankSpan = document.createElement('span'); rankSpan.className = 'player-rank'; rankSpan.textContent = rankLabel;
             const nameSpan = document.createElement('span'); nameSpan.className = 'player-name'; nameSpan.textContent = nome;
             infoDiv.appendChild(rankSpan); infoDiv.appendChild(nameSpan);
             const scoreSpan = document.createElement('span'); scoreSpan.className = 'player-score'; scoreSpan.textContent = scores[nome] || 0;
-            item.appendChild(infoDiv); item.appendChild(scoreSpan);
-            container.appendChild(item);
+            item.appendChild(infoDiv); item.appendChild(scoreSpan); container.appendChild(item);
         });
     }
 
     function checkEndGameConditions() {
         for (const [jogador, pontuacao] of Object.entries(scores)) {
-            if (pontuacao >= PONTUACAO_MAXIMA) {
-                triggerVictory(jogador);
-                return true;
-            }
+            if (pontuacao >= PONTUACAO_MAXIMA) { triggerVictory(jogador); return true; }
         }
         return false;
     }
 
     function triggerVictory(vencedor) {
-        gameEnded = true;
-        roundActive = false;
-        clearInterval(countdownInterval);
-        clearTimeout(nextRoundTimeout);
-        
-        document.getElementById('btn-egg').style.display = 'none';
-        document.getElementById('btn-flower').style.display = 'none';
-        document.getElementById('btn-skip').style.display = 'none';
-        
-        document.getElementById('word-display').innerText = `👑 CONEXÃO COMPLETA! JUNTOS SOMOS UM!`;
-        document.getElementById('timer-display').innerText = "⏱️ Fim";
-        
-        showGarticAnnouncement("👑 SINTONIA MÁXIMA!", `${vencedor} alcançou a pontuação ideal! Que casalzão! 🎉`);
-        addSystemMessage(`👑 PARTIDA CONCLUÍDA! Sintonia estabelecida com sucesso.`);
+        gameEnded = true; roundActive = false; clearInterval(countdownInterval); clearTimeout(nextRoundTimeout);
+        document.getElementById('btn-egg').style.display = 'none'; document.getElementById('btn-flower').style.display = 'none'; document.getElementById('btn-skip').style.display = 'none';
+        document.getElementById('word-display').innerText = `🏆 FIM DE JOGO!`; document.getElementById('timer-display').innerText = "⏱️ Fim";
+        showGarticAnnouncement("🎉 VITÓRIA!", `${vencedor} atingiu o placar máximo!`);
         createPetalShower();
     }
 
     function addScore(nome, pts) {
-        if (gameEnded) return;
-        if (!scores[nome]) scores[nome] = 0;
-        scores[nome] += pts;
-        renderScoreboard();
+        if (gameEnded) return; if (!scores[nome]) scores[nome] = 0; scores[nome] += pts; renderScoreboard();
         const el = document.getElementById("p-" + nome.replace(/\s+/g,'-'));
-        if (el) {
-            const scoreEl = el.querySelector('.player-score');
-            if (scoreEl) { scoreEl.classList.add('bump'); setTimeout(() => scoreEl.classList.remove('bump'), 350); }
-        }
+        if (el) { const scoreEl = el.querySelector('.player-score'); if (scoreEl) { scoreEl.classList.add('bump'); setTimeout(() => scoreEl.classList.remove('bump'), 350); } }
     }
 
     function showGarticAnnouncement(title, desc) {
-        const box = document.getElementById('round-announcement');
-        document.getElementById('announcement-title').innerText = title;
-        document.getElementById('announcement-desc').innerText = desc;
-        box.classList.add('show');
-        setTimeout(() => { box.classList.remove('show'); }, 3200);
+        const box = document.getElementById('round-announcement'); document.getElementById('announcement-title').innerText = title; document.getElementById('announcement-desc').innerText = desc;
+        box.classList.add('show'); setTimeout(() => { box.classList.remove('show'); }, 3000);
     }
 
     function showScorePopup(pts, nome) {
-        const playerEl = document.getElementById("p-" + nome.replace(/\s+/g,'-'));
-        if (!playerEl) return;
-        const rect = playerEl.getBoundingClientRect();
-        const popup = document.createElement('div');
-        popup.className = 'score-popup';
-        popup.textContent = '+' + pts + ' pts';
-        popup.style.left = (rect.left + rect.width/2 - 30) + 'px';
-        popup.style.top  = (rect.top - 10) + 'px';
-        document.body.appendChild(popup);
-        setTimeout(() => popup.remove(), 1500);
+        const playerEl = document.getElementById("p-" + nome.replace(/\s+/g,'-')); if (!playerEl) return;
+        const rect = playerEl.getBoundingClientRect(); const popup = document.createElement('div');
+        popup.className = 'score-popup'; popup.textContent = '+' + pts; popup.style.left = (rect.left + rect.width/2 - 15) + 'px'; popup.style.top = (rect.top - 10) + 'px';
+        document.body.appendChild(popup); setTimeout(() => popup.remove(), 1200);
     }
 
     function throwInteractItem(itemType) {
         if (!roundActive || isDrawer || !mqttClient || gameEnded) return;
         if (itemType === 'egg') {
-            if (eggCooldown) return;
-            eggCooldown = true;
-            const btn = document.getElementById('btn-egg');
-            btn.classList.add('cooldown'); btn.textContent = '❤️ Carregando...';
+            if (eggCooldown) return; eggCooldown = true; const btn = document.getElementById('btn-egg'); btn.classList.add('cooldown');
             mqttClient.publish(baseTopic + "/interact", JSON.stringify({ thrower: username, target: currentDrawerName, type: 'egg' }));
-            setTimeout(() => { eggCooldown = false; btn.classList.remove('cooldown'); btn.textContent = '❤️ Jogar Coração!'; }, 8000);
+            setTimeout(() => { eggCooldown = false; btn.classList.remove('cooldown'); }, 4000);
         } else if (itemType === 'flower') {
-            if (flowerCooldown) return;
-            flowerCooldown = true;
-            const btn = document.getElementById('btn-flower');
-            btn.classList.add('cooldown'); btn.textContent = '💋 Preparando...';
+            if (flowerCooldown) return; flowerCooldown = true; const btn = document.getElementById('btn-flower'); btn.classList.add('cooldown');
             mqttClient.publish(baseTopic + "/interact", JSON.stringify({ thrower: username, target: currentDrawerName, type: 'flower' }));
-            setTimeout(() => { flowerCooldown = false; btn.classList.remove('cooldown'); btn.textContent = '💋 Mandar Beijo!'; }, 5000);
+            setTimeout(() => { flowerCooldown = false; btn.classList.remove('cooldown'); }, 4000);
         }
     }
 
     function animateInteractThrow(thrower, target, type) {
-        const throwerEl = document.getElementById("p-" + thrower.replace(/\s+/g,'-'));
-        const canvasRect = canvas.getBoundingClientRect();
+        const throwerEl = document.getElementById("p-" + thrower.replace(/\s+/g,'-')); const canvasRect = canvas.getBoundingClientRect();
         let sx = window.innerWidth / 2, sy = window.innerHeight - 100;
         if (throwerEl) { const r = throwerEl.getBoundingClientRect(); sx = r.left + r.width/2; sy = r.top + r.height/2; }
-        const targetX = canvasRect.left + canvasRect.width/2 + (Math.random()-0.5)*120;
-        const targetY = canvasRect.top + canvasRect.height/2 + (Math.random()-0.5)*100;
-        const element = document.createElement('div');
-        element.className = type === 'egg' ? 'egg-fly' : 'flower-fly';
-        element.textContent = type === 'egg' ? '❤️' : '💋';
-        const dx = targetX - sx, dy = targetY - sy;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        const duration = Math.max(0.5, Math.min(1.0, dist/900));
-        const angle = Math.atan2(dy, dx) * (180/Math.PI) + 90;
-        element.style.setProperty('--tx', dx*0.75+'px'); element.style.setProperty('--ty', dy*0.75+'px');
-        element.style.setProperty('--tx2', dx+'px'); element.style.setProperty('--rot', angle+'deg'); element.style.setProperty('--duration', duration+'s');
-        element.style.left = sx+'px'; element.style.top = sy+'px';
-        document.body.appendChild(element);
+        const targetX = canvasRect.left + canvasRect.width/2 + (Math.random()-0.5)*100; const targetY = canvasRect.top + canvasRect.height/2 + (Math.random()-0.5)*80;
+        const element = document.createElement('div'); element.className = type === 'egg' ? 'egg-fly' : 'flower-fly'; element.textContent = type === 'egg' ? '❤️' : '💋';
+        const dx = targetX - sx, dy = targetY - sy; const dist = Math.sqrt(dx*dx + dy*dx); const duration = Math.max(0.4, Math.min(0.8, dist/800));
+        element.style.setProperty('--tx2', dx+'px'); element.style.setProperty('--ty2', dy+'px'); element.style.setProperty('--duration', duration+'s');
+        element.style.left = sx+'px'; element.style.top = sy+'px'; document.body.appendChild(element);
         setTimeout(() => {
-            element.remove();
-            const splash = document.createElement('div');
-            splash.className = type === 'egg' ? 'egg-splash' : 'flower-splash';
-            splash.textContent = type === 'egg' ? '💖' : '✨';
-            splash.style.left = (targetX-24)+'px'; splash.style.top = (targetY-24)+'px';
-            document.body.appendChild(splash);
-            setTimeout(() => splash.remove(), 900);
+            element.remove(); const splash = document.createElement('div'); splash.className = type === 'egg' ? 'egg-splash' : 'flower-splash';
+            splash.textContent = type === 'egg' ? '💖' : '✨'; splash.style.left = (targetX-16)+'px'; splash.style.top = (targetY-16)+'px'; document.body.appendChild(splash);
+            setTimeout(() => splash.remove(), 600);
             if (target === username) {
                 if (type === 'egg') {
-                    const overlay = document.getElementById('egg-overlay');
-                    overlay.classList.remove('splat'); void overlay.offsetWidth; overlay.classList.add('splat');
-                    document.getElementById('canvas-container').classList.add('shake');
-                    setTimeout(() => document.getElementById('canvas-container').classList.remove('shake'), 500);
+                    const overlay = document.getElementById('egg-overlay'); overlay.classList.add('splat');
+                    setTimeout(() => overlay.classList.remove('splat'), 1000);
                 } else if (type === 'flower') { createPetalShower(); }
             }
         }, duration * 1000);
     }
 
     function createPetalShower() {
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 10; i++) {
             setTimeout(() => {
-                const petal = document.createElement('div');
-                petal.className = 'petal-particle';
-                petal.textContent = ['💋','❤️','✨'][Math.floor(Math.random() * 3)];
-                petal.style.left = Math.random() * window.innerWidth + 'px';
-                petal.style.setProperty('--drift', (Math.random() * 160 - 80) + 'px');
-                petal.style.setProperty('--fall-duration', (Math.random() * 1.5 + 1.5) + 's');
-                document.body.appendChild(petal);
-                setTimeout(() => petal.remove(), 3000);
-            }, i * 100);
+                const petal = document.createElement('div'); petal.className = 'petal-particle'; petal.textContent = ['💋','❤️'][Math.floor(Math.random() * 2)];
+                petal.style.left = Math.random() * window.innerWidth + 'px'; petal.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
+                petal.style.setProperty('--fall-duration', (Math.random() * 1 + 1) + 's'); document.body.appendChild(petal);
+                setTimeout(() => petal.remove(), 2000);
+            }, i * 80);
         }
     }
 
@@ -1125,251 +802,129 @@
         username = document.getElementById('input-username').value.trim();
         roomName = document.getElementById('input-room').value.trim().toLowerCase().replace(/[^a-z0-9]/g,"");
         const customInput = document.getElementById('input-custom-words').value.trim();
-        if (!username || !roomName) { alert("Digite o seu nome e o código da sala para sincronizar!"); return; }
+        if (!username || !roomName) { alert("Preencha seu nome e o código da sala!"); return; }
         if (customInput) { customWords = customInput.split(',').map(w => w.trim()).filter(w => w.length > 0); }
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('room-id').innerText = "Sala: " + roomName;
         adicionarJogadorLista(username);
-        initCanvasResolution();
-        initMqtt();
+        initCanvasResolution(); initMqtt();
     }
 
     function initMqtt() {
         baseTopic = "gartic_clone_romantic_2026/" + roomName;
         mqttClient = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
         mqttClient.on('connect', () => {
-            mqttClient.subscribe(baseTopic + "/chat");
-            mqttClient.subscribe(baseTopic + "/draw");
-            mqttClient.subscribe(baseTopic + "/presence");
-            mqttClient.subscribe(baseTopic + "/presence/echo");
-            mqttClient.subscribe(baseTopic + "/gameflow");
-            mqttClient.subscribe(baseTopic + "/gameflow/skip");
-            mqttClient.subscribe(baseTopic + "/scores");
-            mqttClient.subscribe(baseTopic + "/interact");
-            mqttClient.subscribe(baseTopic + "/customwords");
-            mqttClient.subscribe(baseTopic + "/customwords/add");
-            
-            const identityPayload = JSON.stringify({ sender: "Sistema", text: `📢 ${username} entrou na sala do amor.`, name: username, type: "system" });
-            mqttClient.publish(baseTopic + "/chat", identityPayload);
-            mqttClient.publish(baseTopic + "/presence", identityPayload);
-            
+            mqttClient.subscribe(baseTopic + "/#");
+            const identityPayload = JSON.stringify({ sender: "Sistema", text: `📢 ${username} entrou na sala.`, name: username, type: "system" });
+            mqttClient.publish(baseTopic + "/chat", identityPayload); mqttClient.publish(baseTopic + "/presence", identityPayload);
             carregarPalavrasSalvas();
             if (customWords.length > 0) { mqttClient.publish(baseTopic + "/customwords", JSON.stringify({ words: customWords, sender: username })); }
-            setTimeout(() => { checkAndAutoStart(); }, 2000);
+            setTimeout(() => { checkAndAutoStart(); }, 1500);
         });
 
         mqttClient.on('message', (topic, message) => {
             const data = JSON.parse(message.toString());
-            
             if (topic === baseTopic + "/chat") {
-                if (data.type === "system") {
-                    addSystemMessage(data.text);
-                    if (data.name) { adicionarJogadorLista(data.name); checkAndAutoStart(); }
-                } else if (data.type === "guess") {
+                if (data.type === "system") { addSystemMessage(data.text); if (data.name) { adicionarJogadorLista(data.name); checkAndAutoStart(); } }
+                else if (data.type === "guess") {
                     if (data.isCorrect) {
-                        addSuccessMessage(data.sender, data.text);
-                        const pts = data.pts || 5;
-                        addScore(data.sender, pts); showScorePopup(pts, data.sender);
+                        addSuccessMessage(data.sender, data.text); const pts = data.pts || 5; addScore(data.sender, pts); showScorePopup(pts, data.sender);
                         if (currentDrawerName) { const dp = Math.max(1, Math.round(pts * 0.5)); addScore(currentDrawerName, dp); showScorePopup(dp, currentDrawerName); }
-                        broadcastScores();
-                        
-                        if (checkEndGameConditions()) return;
-                        
-                        showGarticAnnouncement("🎯 ACERTOU!", `${data.sender} adivinhou a memória oculta: ${currentWord.toUpperCase()}!`);
-                        handleRoundEndAutomatically();
+                        broadcastScores(); if (checkEndGameConditions()) return;
+                        showGarticAnnouncement("🎯 ACERTOU!", `${data.sender} adivinhou: ${currentWord.toUpperCase()}!`); handleRoundEndAutomatically();
                     } else { renderWrongGuessMessage(data.sender, data.text); }
                 } else if (data.type === "talk") { renderNormalMessage(data.sender, data.text); }
-            } else if (topic === baseTopic + "/draw" && !isDrawer && !gameEnded) {
-                renderRemoteDraw(data);
-            } else if (topic === baseTopic + "/presence") {
-                if (data.name && data.name !== username) {
-                    adicionarJogadorLista(data.name);
-                    mqttClient.publish(baseTopic + "/presence/echo", JSON.stringify({ name: username }));
-                    if (customWords.length > 0) { mqttClient.publish(baseTopic + "/customwords", JSON.stringify({ words: customWords, sender: username })); }
-                    checkAndAutoStart();
-                }
-            } else if (topic === baseTopic + "/presence/echo") {
-                if (data.name && data.name !== username) { adicionarJogadorLista(data.name); checkAndAutoStart(); }
-            } else if (topic === baseTopic + "/gameflow" && !gameEnded) {
-                handleGameFlow(data);
-            } else if (topic === baseTopic + "/gameflow/skip" && !gameEnded) {
-                showGarticAnnouncement("⏭️ MUDANÇA DE FOCO", `${data.drawer} passou a vez. A palavra era: ${data.word.toUpperCase()}`);
-                addSystemMessage(`⏭️ Pulou: ${data.drawer}. O momento era: ${data.word.toUpperCase()}`);
-                handleRoundEndAutomatically();
-            } else if (topic === baseTopic + "/scores") {
-                if (data.scores) { 
-                    for (const [n,p] of Object.entries(data.scores)) { 
-                        if (n !== username) { scores[n]=p; } 
-                    } 
-                    renderScoreboard(); 
-                    checkEndGameConditions();
-                }
-            } else if (topic === baseTopic + "/interact") {
-                animateInteractThrow(data.thrower, data.target, data.type);
-                if (data.type === 'egg') addEggMessage(data.thrower, data.target);
-                else if (data.type === 'flower') addFlowerMessage(data.thrower, data.target);
-            } else if (topic === baseTopic + "/customwords") {
-                if (data.words && data.words.length > 0 && customWords.length === 0) {
-                    customWords = data.words;
-                    addSystemMessage(`📝 Banco de memórias de ${data.sender} injetado! (${data.words.length})`);
-                    salvarPalavras();
-                }
-            } else if (topic === baseTopic + "/customwords/add") {
-                if (data.words && data.words.length > 0) {
-                    data.words.forEach(w => { if(!customWords.includes(w)) customWords.push(w); });
-                    addSystemMessage(`📝 ${data.sender} adicionou +${data.words.length} momentos na lista!`);
-                    salvarPalavras();
-                }
-            }
+            } else if (topic === baseTopic + "/draw" && !isDrawer && !gameEnded) { renderRemoteDraw(data); }
+            else if (topic === baseTopic + "/presence") { if (data.name && data.name !== username) { adicionarJogadorLista(data.name); mqttClient.publish(baseTopic + "/presence/echo", JSON.stringify({ name: username })); if (customWords.length > 0) { mqttClient.publish(baseTopic + "/customwords", JSON.stringify({ words: customWords, sender: username })); } checkAndAutoStart(); } }
+            else if (topic === baseTopic + "/presence/echo") { if (data.name && data.name !== username) { adicionarJogadorLista(data.name); checkAndAutoStart(); } }
+            else if (topic === baseTopic + "/gameflow" && !gameEnded) { handleGameFlow(data); }
+            else if (topic === baseTopic + "/gameflow/skip" && !gameEnded) { showGarticAnnouncement("⏭️ PRÓXIMO TEMA", `${data.drawer} pulou a vez. Era: ${data.word.toUpperCase()}`); handleRoundEndAutomatically(); }
+            else if (topic === baseTopic + "/scores") { if (data.scores) { for (const [n,p] of Object.entries(data.scores)) { if (n !== username) { scores[n]=p; } } renderScoreboard(); checkEndGameConditions(); } }
+            else if (topic === baseTopic + "/interact") { animateInteractThrow(data.thrower, data.target, data.type); }
+            else if (topic === baseTopic + "/customwords") { if (data.words && data.words.length > 0 && customWords.length === 0) { customWords = data.words; addSystemMessage(`📝 Temas customizados de ${data.sender} carregados!`); salvarPalavras(); } }
+            else if (topic === baseTopic + "/customwords/add") { if (data.words && data.words.length > 0) { data.words.forEach(w => { if(!customWords.includes(w)) customWords.push(w); }); addSystemMessage(`📝 +${data.words.length} novos temas inseridos!`); salvarPalavras(); } }
         });
     }
 
-    function broadcastScores() {
-        if (!mqttClient) return;
-        mqttClient.publish(baseTopic + "/scores", JSON.stringify({ scores }));
-    }
+    function broadcastScores() { if (mqttClient) mqttClient.publish(baseTopic + "/scores", JSON.stringify({ scores })); }
 
-    function checkAndAutoStart() {
-        if (!roundActive && currentDrawerName === "" && listaJogadores.size > 0 && !gameEnded) {
-            const arr = Array.from(listaJogadores);
-            if (arr[0] === username) { drawNewRound(); }
-        }
-    }
+    function checkAndAutoStart() { if (!roundActive && currentDrawerName === "" && listaJogadores.size > 0 && !gameEnded) { const arr = Array.from(listaJogadores); if (arr[0] === username) { drawNewRound(); } } }
 
     function drawNewRound() {
-        if (!mqttClient || gameEnded) return;
-        const arr = Array.from(listaJogadores); if (arr.length === 0) return;
-        currentDrawerIndex = (currentDrawerIndex + 1) % arr.length;
-        const nextDrawer = arr[currentDrawerIndex];
-        const lista = getPalavras();
-        const randomWord = lista[Math.floor(Math.random() * lista.length)];
+        if (!mqttClient || gameEnded) return; const arr = Array.from(listaJogadores); if (arr.length === 0) return;
+        currentDrawerIndex = (currentDrawerIndex + 1) % arr.length; const nextDrawer = arr[currentDrawerIndex];
+        const lista = getPalavras(); const randomWord = lista[Math.floor(Math.random() * lista.length)];
         mqttClient.publish(baseTopic + "/gameflow", JSON.stringify({ drawer: nextDrawer, word: randomWord, currentIndex: currentDrawerIndex }));
     }
 
     function handleGameFlow(data) {
-        if (gameEnded) return;
-        clearInterval(countdownInterval); clearTimeout(nextRoundTimeout);
+        if (gameEnded) return; clearInterval(countdownInterval); clearTimeout(nextRoundTimeout);
         currentDrawerName = data.drawer; currentWord = data.word; currentDrawerIndex = data.currentIndex;
-        roundActive = true; currentTimeLeft = TEMPO_RODADA;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        renderScoreboard();
+        roundActive = true; currentTimeLeft = TEMPO_RODADA; ctx.clearRect(0, 0, canvas.width, canvas.height); renderScoreboard();
         
         const matchTema = PALAVRAS_PADRAO_OBJ.find(item => item.palavra.toLowerCase() === currentWord.toLowerCase());
-        const textoDialogo = matchTema ? matchTema.dialogo : "Aproveitem para conversar sobre as memórias que esse termo traz para vocês!";
-        document.getElementById('dialogue-text').innerText = textoDialogo;
+        document.getElementById('dialogue-text').innerText = matchTema ? matchTema.dialogo : "O que essa lembrança traz na sua mente?";
 
-        const eggBtn = document.getElementById('btn-egg');
-        const flowerBtn = document.getElementById('btn-flower');
-        const skipBtn = document.getElementById('btn-skip');
+        const eggBtn = document.getElementById('btn-egg'); const flowerBtn = document.getElementById('btn-flower'); const skipBtn = document.getElementById('btn-skip');
         if (currentDrawerName === username) {
-            isDrawer = true; eggBtn.style.display = 'none'; flowerBtn.style.display = 'none';
-            skipBtn.style.display = 'inline-flex';
-            document.getElementById('word-display').innerText = "✏️ Seu momento secreto: " + currentWord.toUpperCase();
-            addSystemMessage(`✏️ É sua vez! Desenhe: ${currentWord.toUpperCase()}`);
+            isDrawer = true; eggBtn.style.display = 'none'; flowerBtn.style.display = 'none'; skipBtn.style.display = 'inline-flex';
+            document.getElementById('word-display').innerText = "✏️ Desenhe: " + currentWord.toUpperCase();
         } else {
-            isDrawer = false; skipBtn.style.display = 'none';
-            eggBtn.style.display = 'inline-flex'; eggBtn.classList.remove('cooldown'); eggBtn.textContent = '❤️ Jogar Coração!';
-            flowerBtn.style.display = 'inline-flex'; flowerBtn.classList.remove('cooldown'); flowerBtn.textContent = '💋 Mandar Beijo!';
-            const u = "_ ".repeat(currentWord.length).trim();
-            document.getElementById('word-display').innerText = `🎨 Desenhando: ${currentDrawerName} (${u})`;
-            addSystemMessage(`🎨 ${currentDrawerName} está criando o traço...`);
+            isDrawer = false; skipBtn.style.display = 'none'; eggBtn.style.display = 'inline-flex'; flowerBtn.style.display = 'inline-flex';
+            const u = "_ ".repeat(currentWord.length).trim(); document.getElementById('word-display').innerText = `🎨 Desenhando: ${currentDrawerName} (${u})`;
         }
         startLocalTimer(TEMPO_RODADA);
     }
 
     function startLocalTimer(seconds) {
-        if (gameEnded) return;
-        currentTimeLeft = seconds;
-        document.getElementById('timer-display').innerText = "⏱️ Tempo: " + currentTimeLeft + "s";
+        if (gameEnded) return; currentTimeLeft = seconds; document.getElementById('timer-display').innerText = "⏱️ " + currentTimeLeft + "s";
         countdownInterval = setInterval(() => {
-            if (gameEnded) { clearInterval(countdownInterval); return; }
-            currentTimeLeft--;
+            if (gameEnded) { clearInterval(countdownInterval); return; } currentTimeLeft--;
             if (currentTimeLeft <= 0) {
-                clearInterval(countdownInterval);
-                document.getElementById('timer-display').innerText = "⏱️ Tempo: 0s";
-                addSystemMessage(`🛑 Fim do tempo! A palavra era: ${currentWord.toUpperCase()}`);
-                showGarticAnnouncement("⏳ TEMPO ESGOTADO", `O momento misterioso era: ${currentWord.toUpperCase()}`);
-                document.getElementById('btn-egg').style.display = 'none';
-                document.getElementById('btn-flower').style.display = 'none';
-                document.getElementById('btn-skip').style.display = 'none';
-                handleRoundEndAutomatically();
-            } else {
-                document.getElementById('timer-display').innerText = "⏱️ Tempo: " + currentTimeLeft + "s";
-            }
+                clearInterval(countdownInterval); document.getElementById('timer-display').innerText = "⏱️ 0s";
+                showGarticAnnouncement("⏳ TEMPO ESGOTADO", `A palavra era: ${currentWord.toUpperCase()}`); handleRoundEndAutomatically();
+            } else { document.getElementById('timer-display').innerText = "⏱️ " + currentTimeLeft + "s"; }
         }, 1000);
     }
 
     function handleRoundEndAutomatically() {
         roundActive = false; clearInterval(countdownInterval);
-        document.getElementById('btn-egg').style.display = 'none';
-        document.getElementById('btn-flower').style.display = 'none';
-        document.getElementById('btn-skip').style.display = 'none';
-        if (gameEnded) return;
-        if (currentDrawerName === username) { nextRoundTimeout = setTimeout(() => { if (!gameEnded) drawNewRound(); }, 4000); }
+        document.getElementById('btn-egg').style.display = 'none'; document.getElementById('btn-flower').style.display = 'none'; document.getElementById('btn-skip').style.display = 'none';
+        if (gameEnded) return; if (currentDrawerName === username) { nextRoundTimeout = setTimeout(() => { if (!gameEnded) drawNewRound(); }, 4000); }
     }
 
-    function adicionarJogadorLista(nome) {
-        if (listaJogadores.has(nome)) return;
-        listaJogadores.add(nome); if (!scores[nome]) scores[nome] = 0;
-        renderScoreboard();
-    }
+    function adicionarJogadorLista(nome) { if (listaJogadores.has(nome)) return; listaJogadores.add(nome); if (!scores[nome]) scores[nome] = 0; renderScoreboard(); }
 
     function sendDrawData(action, x, y, color, size, shapeType = '', endX = 0, endY = 0) {
-        if (!mqttClient || !roundActive || gameEnded) return;
-        mqttClient.publish(baseTopic + "/draw", JSON.stringify({ action, x, y, color, size, shapeType, endX, endY }));
+        if (!mqttClient || !roundActive || gameEnded) return; mqttClient.publish(baseTopic + "/draw", JSON.stringify({ action, x, y, color, size, shapeType, endX, endY }));
     }
 
-    function sendClear() {
-        if (!isDrawer || gameEnded) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (mqttClient) mqttClient.publish(baseTopic + "/draw", JSON.stringify({ action: 'clear' }));
-    }
+    function sendClear() { if (!isDrawer || gameEnded) return; ctx.clearRect(0, 0, canvas.width, canvas.height); if (mqttClient) mqttClient.publish(baseTopic + "/draw", JSON.stringify({ action: 'clear' })); }
 
     function sendGuessMessage() {
-        const input = document.getElementById('guess-input'); const msgText = input.value.trim();
-        if (!msgText || !mqttClient || gameEnded) return;
+        const input = document.getElementById('guess-input'); const msgText = input.value.trim(); if (!msgText || !mqttClient || gameEnded) return;
         if (!roundActive || isDrawer) { input.value = ""; return; }
         const palpiteLimpo = msgText.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
         const respostaLimpa = currentWord.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
         if (palpiteLimpo === respostaLimpa) {
             const pts = calcPoints(currentTimeLeft);
-            mqttClient.publish(baseTopic + "/chat", JSON.stringify({ sender: username, text: `adivinhou certinho: ${currentWord.toUpperCase()}! 🎯`, isCorrect: true, pts, type: "guess" }));
-        } else {
-            mqttClient.publish(baseTopic + "/chat", JSON.stringify({ sender: username, text: msgText, isCorrect: false, type: "guess" }));
-        }
+            mqttClient.publish(baseTopic + "/chat", JSON.stringify({ sender: username, text: `acertou a palavra! 🎯`, isCorrect: true, pts, type: "guess" }));
+        } else { mqttClient.publish(baseTopic + "/chat", JSON.stringify({ sender: username, text: msgText, isCorrect: false, type: "guess" })); }
         input.value = "";
     }
 
     function sendChatMessage() {
-        const input = document.getElementById('chat-input'); const msgText = input.value.trim();
-        if (!msgText || !mqttClient) return;
-        mqttClient.publish(baseTopic + "/chat", JSON.stringify({ sender: username, text: msgText, type: "talk" }));
-        input.value = "";
+        const input = document.getElementById('chat-input'); const msgText = input.value.trim(); if (!msgText || !mqttClient) return;
+        mqttClient.publish(baseTopic + "/chat", JSON.stringify({ sender: username, text: msgText, type: "talk" })); input.value = "";
     }
 
     document.getElementById('guess-input').addEventListener('keypress', function(e) { if (e.key === 'Enter') sendGuessMessage(); });
     document.getElementById('chat-input').addEventListener('keypress', function(e) { if (e.key === 'Enter') sendChatMessage(); });
 
-    function addSystemMessage(text) {
-        const c = document.getElementById('guess-messages'); const m = document.createElement('div'); m.className = "msg msg-system"; m.innerText = text; c.appendChild(m); c.scrollTop = c.scrollHeight;
-    }
-    function addSuccessMessage(sender, text) {
-        const c = document.getElementById('guess-messages'); const m = document.createElement('div'); m.className = "msg msg-success"; m.innerText = `🎯 ${sender} ${text}`; c.appendChild(m); c.scrollTop = c.scrollHeight;
-        if (!gameEnded) document.getElementById('word-display').innerText = "🎉 Acertou! Sincronizando próxima rodada...";
-    }
-    function renderWrongGuessMessage(sender, text) {
-        const c = document.getElementById('guess-messages'); const m = document.createElement('div'); m.className = "msg msg-wrong"; m.innerText = `${sender}: ${text}`; c.appendChild(m); c.scrollTop = m.scrollHeight;
-    }
-    function renderNormalMessage(sender, text) {
-        const c = document.getElementById('chat-messages'); const m = document.createElement('div'); m.className = "msg msg-normal"; const s = document.createElement('span'); s.className = "username"; s.innerText = sender + ": ";
-        m.appendChild(s); m.appendChild(document.createTextNode(text)); c.appendChild(m); c.scrollTop = c.scrollHeight;
-    }
-    function addEggMessage(thrower, target) {
-        const c = document.getElementById('chat-messages'); const m = document.createElement('div'); m.className = "msg msg-egg"; m.innerText = `❤️ ${thrower} enviou vibrações de amor para ${target}!`; c.appendChild(m); c.scrollTop = c.scrollHeight;
-    }
-    function addFlowerMessage(thrower, target) {
-        const c = document.getElementById('chat-messages'); const m = document.createElement('div'); m.className = "msg msg-flower"; m.innerText = `💋 ${thrower} mandou um beijo apaixonado para ${target}!`; c.appendChild(m); c.scrollTop = c.scrollHeight;
-    }
+    function addSystemMessage(text) { const c = document.getElementById('guess-messages'); const m = document.createElement('div'); m.className = "msg msg-system"; m.innerText = text; c.appendChild(m); c.scrollTop = c.scrollHeight; }
+    function addSuccessMessage(sender, text) { const c = document.getElementById('guess-messages'); const m = document.createElement('div'); m.className = "msg msg-success"; m.innerText = `🎯 ${sender} ${text}`; c.appendChild(m); c.scrollTop = c.scrollHeight; }
+    function renderWrongGuessMessage(sender, text) { const c = document.getElementById('guess-messages'); const m = document.createElement('div'); m.className = "msg msg-wrong"; m.innerText = `${sender}: ${text}`; c.appendChild(m); c.scrollTop = m.scrollHeight; }
+    function renderNormalMessage(sender, text) { const c = document.getElementById('chat-messages'); const m = document.createElement('div'); m.className = "msg msg-normal"; const s = document.createElement('span'); s.className = "username"; s.innerText = sender + ": "; m.appendChild(s); m.appendChild(document.createTextNode(text)); c.appendChild(m); c.scrollTop = c.scrollHeight; }
 
     setActiveColor('#000000');
 </script>
