@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Traços do Amor - Realtime ❤️</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -22,85 +22,94 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--cor-fundo);
             color: var(--cor-texto);
             min-height: 100vh;
+            min-height: -webkit-fill-available;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 15px;
+            padding: 10px;
         }
 
-        /* TELA DE LOBBY / CONEXÃO */
+        html {
+            height: -webkit-fill-available;
+        }
+
+        /* LOBBY */
         .tela-lobby {
             background: var(--cor-painel);
-            padding: 30px;
-            border-radius: 20px;
+            padding: 25px;
+            border-radius: 16px;
             box-shadow: 0 10px 30px rgba(255, 77, 109, 0.15);
             border: 2px solid var(--cor-borda);
             text-align: center;
-            max-width: 400px;
+            max-width: 360px;
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         .lobby-inputs {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .input-lobby {
-            padding: 12px;
+            padding: 14px;
             border: 2px solid var(--cor-borda);
             border-radius: 10px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             text-align: center;
             outline: none;
+            color: var(--cor-texto);
+            font-weight: bold;
         }
 
         .input-lobby:focus {
             border-color: var(--cor-principal);
         }
 
-        /* ESTRUTURA PRINCIPAL DO JOGO */
+        /* CONTAINER PRINCIPAL DO JOGO */
         .jogo-container {
             background: var(--cor-painel);
             width: 100%;
             max-width: 1100px;
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.12);
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(255, 77, 109, 0.1);
             border: 2px solid var(--cor-borda);
             display: grid;
-            grid-template-columns: 340px 1fr;
+            grid-template-columns: 320px 1fr;
             overflow: hidden;
-            height: 700px;
-            display: none; /* Oculto até conectar */
+            height: 680px;
+            display: none;
         }
 
+        /* PAINEL LATERAL ESQUERDO */
         .painel-lateral {
             border-right: 2px solid var(--cor-borda);
             background: var(--cor-fundo-claro);
             display: flex;
             flex-direction: column;
-            padding: 25px;
+            padding: 20px;
             justify-content: space-between;
             overflow-y: auto;
         }
 
         .cabecalho-jogo {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .titulo-jogo {
             color: var(--cor-principal);
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             font-weight: 800;
         }
 
@@ -108,46 +117,49 @@
             display: inline-block;
             background: var(--cor-borda);
             color: var(--cor-texto);
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: bold;
-            margin-top: 5px;
+            margin-top: 4px;
         }
 
         .caixa-contexto {
             background: white;
-            border: 2px solid var(--cor-borda);
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 20px;
+            border: 1px solid var(--cor-borda);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
         }
 
         .caixa-contexto h3 {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             color: var(--cor-secundaria);
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .caixa-contexto p {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
+            line-height: 1.3;
         }
 
         .painel-dialogo {
             background: linear-gradient(135deg, #fff0f3, #ffe5ec);
-            padding: 18px;
-            border-radius: 16px;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            border-left: 5px solid var(--cor-principal);
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            border-left: 4px solid var(--cor-principal);
         }
 
         .painel-dialogo strong {
             color: var(--cor-principal);
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
         }
 
         .btn {
@@ -155,172 +167,212 @@
             color: white;
             border: none;
             padding: 14px;
-            border-radius: 12px;
+            border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s ease;
             width: 100%;
             font-size: 1rem;
-            box-shadow: 0 4px 12px rgba(255, 77, 109, 0.2);
+            box-shadow: 0 4px 10px rgba(255, 77, 109, 0.15);
         }
 
         .btn:hover {
             background: #ff2a55;
-            transform: translateY(-2px);
         }
 
         .btn:disabled {
             background: #ccb3b7;
             cursor: not-allowed;
-            transform: none;
             box-shadow: none;
         }
 
-        /* ÁREAS DE CONTEÚDO */
+        /* ÁREA CENTRAL DE INTERAÇÃO */
         .area-central {
             display: flex;
             flex-direction: column;
             background: #ffffff;
-            padding: 25px;
+            padding: 20px;
             position: relative;
         }
 
         .instrucao-passo {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
-        /* Telas de Estados */
         .tela-fase {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             text-align: center;
+            width: 100%;
         }
 
         .input-frase {
             width: 100%;
-            max-width: 500px;
-            padding: 16px;
+            max-width: 450px;
+            padding: 14px;
             border: 2px solid var(--cor-borda);
-            border-radius: 12px;
-            font-size: 1.1rem;
+            border-radius: 10px;
+            font-size: 1rem;
             outline: none;
             text-align: center;
         }
 
+        /* CANVAS */
+        .canvas-wrapper {
+            flex-grow: 1;
+            width: 100%;
+            position: relative;
+            min-height: 200px;
+        }
+
         canvas {
             background: #ffffff;
-            border: 3px solid var(--cor-borda);
-            border-radius: 18px;
+            border: 2px solid var(--cor-borda);
+            border-radius: 14px;
             cursor: crosshair;
-            flex-grow: 1;
-            box-shadow: inset 0 4px 12px rgba(0,0,0,0.03);
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+            touch-action: none;
         }
 
         .barra-ferramentas {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             align-items: center;
-            margin-top: 15px;
-            padding: 12px 20px;
+            margin-top: 10px;
+            padding: 8px 12px;
             background: var(--cor-fundo-claro);
-            border-radius: 14px;
+            border-radius: 10px;
             width: 100%;
         }
 
         .cores {
             display: flex;
-            gap: 10px;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
         .cor-opcao {
-            width: 32px;
-            height: 32px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             cursor: pointer;
-            border: 2.5px solid white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            border: 2px solid white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
         }
 
         .cor-opcao.selecionada {
             border-color: var(--cor-texto);
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         .btn-limpar {
             background: #748cab;
             color: white;
             border: none;
-            padding: 10px 18px;
-            border-radius: 10px;
+            padding: 6px 12px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 0.8rem;
             margin-left: auto;
         }
 
         .preview-desenho {
             max-width: 100%;
-            max-height: 320px;
-            border: 3px solid var(--cor-borda);
-            border-radius: 18px;
+            max-height: 260px;
+            border: 2px solid var(--cor-borda);
+            border-radius: 14px;
             background: white;
         }
 
         .comparacao {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 12px;
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
         }
 
         .bloco-revelacao {
             background: var(--cor-fundo-claro);
-            padding: 15px;
-            border-radius: 12px;
+            padding: 10px;
+            border-radius: 10px;
             border: 1px solid var(--cor-borda);
+            text-align: left;
         }
 
         .bloco-revelacao span {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             color: var(--cor-secundaria);
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             font-weight: bold;
         }
 
         .bloco-revelacao p {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: bold;
         }
 
-        @media (max-width: 850px) {
-            .jogo-container { grid-template-columns: 1fr; height: auto; }
-            .painel-lateral { border-right: none; border-bottom: 2px solid var(--cor-borda); }
-            canvas { height: 350px; }
+        /* MOBILE RESPONSIVO */
+        @media (max-width: 768px) {
+            body { padding: 5px; }
+            .jogo-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                height: 94vh;
+                height: calc(var(--vh, 1vh) * 94);
+            }
+            .painel-lateral {
+                border-right: none;
+                border-bottom: 2px solid var(--cor-borda);
+                padding: 10px 15px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 8px;
+                justify-content: space-between;
+            }
+            .cabecalho-jogo { text-align: left; margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; }
+            .titulo-jogo { font-size: 1.1rem; }
+            .rodada-status { margin-top: 2px; font-size: 0.7rem; padding: 2px 6px; }
+            #exibicao-sala-id { font-size: 0.7rem !important; }
+            .caixa-contexto, .painel-dialogo { display: none; }
+            .painel-lateral .btn { width: auto; padding: 8px 14px; font-size: 0.85rem; }
+            .area-central { padding: 12px; justify-content: space-between; }
+            .instrucao-passo { font-size: 1rem; margin-bottom: 6px; text-align: center; }
+            .barra-ferramentas { padding: 6px 10px; margin-top: 8px; }
+            .cor-opcao { width: 24px; height: 24px; }
+            .preview-desenho { max-height: 200px; }
+            .comparacao { grid-template-columns: 1fr; gap: 8px; }
         }
     </style>
 </head>
 <body>
 
     <div class="tela-lobby" id="lobby-conexao">
-        <h2 style="color: var(--cor-principal);">Traços do Amor 🛰️</h2>
-        <p>Escolha como deseja se conectar com o seu par para jogarem em tempo real:</p>
+        <h2 style="color: var(--cor-principal); font-size: 1.6rem;">Traços do Amor 🛰️</h2>
+        <p style="font-size: 0.9rem; opacity: 0.8;">Jogue em tempo real de qualquer celular ou computador.</p>
         
-        <button class="btn" onclick="criarSala()">Criar Nova Sala ✨</button>
+        <button class="btn" id="btn-criar-lobby" onclick="criarSala()">Criar Nova Sala ✨</button>
         
-        <div style="margin: 10px 0; font-weight: bold; opacity: 0.5;">OU</div>
+        <div style="font-weight: bold; opacity: 0.4; font-size: 0.8rem;">OU</div>
         
         <div class="lobby-inputs">
-            <input type="text" id="input-codigo-sala" class="input-lobby" placeholder="Código da Sala (Ex: 4732)">
-            <button class="btn" style="background: #2a9d8f;" onclick="entrarSala()">Entrar na Sala do Meu Amor 🔑</button>
+            <input type="number" pattern="[0-9]*" inputmode="numeric" id="input-codigo-sala" class="input-lobby" placeholder="Código de 4 dígitos">
+            <button class="btn" id="btn-entrar-lobby" style="background: #2a9d8f;" onclick="entrarSala()">Entrar na Sala 🔑</button>
         </div>
     </div>
 
@@ -329,43 +381,45 @@
         <div class="painel-lateral">
             <div class="cabecalho-jogo">
                 <h2 class="titulo-jogo">Traços do Amor</h2>
-                <div class="rodada-status" id="label-rodada">Conectado</div>
-                <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;" id="exibicao-sala-id">Sala: ----</div>
+                <div class="rodada-status" id="label-rodada">Sincronizado</div>
+                <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 2px;" id="exibicao-sala-id">Sala: ----</div>
             </div>
 
-            <div>
-                <div class="caixa-contexto">
-                    <h3>Tema da Rodada</h3>
-                    <p id="texto-tema">Aguardando início...</p>
-                </div>
+            <div class="caixa-contexto" id="mobile-esconder-tema">
+                <h3>Tema da Rodada</h3>
+                <p id="texto-tema">Aguardando...</p>
+            </div>
 
-                <div class="painel-dialogo">
-                    <strong>Gatilho de Conversa 💬</strong>
-                    <span id="texto-dialogo">Conectando sintonia...</span>
-                </div>
+            <div class="painel-dialogo" id="mobile-esconder-dialogo">
+                <strong>Gatilho de Conversa 💬</strong>
+                <span id="texto-dialogo">Sintonia em andamento...</span>
             </div>
 
             <button class="btn" id="btn-acao-principal" disabled>
-                Aguardando Jogador...
+                Aguardando...
             </button>
         </div>
 
         <div class="area-central">
             
             <div class="tela-fase" id="fase-espera" style="display: none;">
-                <h2 style="font-size: 2rem;">Sintonia em Andamento... ⏳</h2>
-                <p id="texto-espera">Seu par está tomando uma ação importante agora. Aproveite para puxar assunto!</p>
+                <h2 style="font-size: 1.5rem;" id="titulo-espera">Conectando... ⏳</h2>
+                <p id="texto-espera" style="font-size: 0.95rem; max-width: 280px;"></p>
             </div>
 
             <div class="tela-fase" id="fase-escrita" style="display: none;">
-                <div class="instrucao-passo">✍️ Escreva o seu Momento Secreto</div>
-                <p>Baseado no tema ao lado, crie a descrição exata que seu amor terá que desenhar.</p>
-                <input type="text" id="campo-frase-secreta" class="input-frase" placeholder="Ex: O dia em que dividimos o mesmo casaco na chuva..." autocomplete="off">
+                <div class="instrucao-passo" id="mobile-tema-titulo">✍️ Defina o Momento Secreto</div>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 5px;" id="dica-escrita-mobile">Crie a frase detalhada que seu par precisará adivinhar.</p>
+                <input type="text" id="campo-frase-secreta" class="input-frase" placeholder="Ex: O dia do piquenique sob a árvore..." autocomplete="off">
             </div>
 
-            <div class="tela-fase" id="fase-desenho" style="display: none; width: 100%; height: 100%;">
-                <div class="instrucao-passo">🎨 Sua vez de Desenhar!</div>
-                <canvas id="lousa-amor"></canvas>
+            <div class="tela-fase" id="fase-desenho" style="display: none; height: 100%;">
+                <div class="instrucao-passo" id="instrucao-desenho-mobile">🎨 Desenhe o momento!</div>
+                
+                <div class="canvas-wrapper">
+                    <canvas id="lousa-amor"></canvas>
+                </div>
+
                 <div class="barra-ferramentas">
                     <div class="cores">
                         <div class="cor-opcao selecionada" style="background: #ff4d6d;" onclick="mudarCor('#ff4d6d', this)"></div>
@@ -381,7 +435,7 @@
 
             <div class="tela-fase" id="fase-revelacao" style="display: none;">
                 <div class="instrucao-passo">❤️ Nossa Recordação Completa!</div>
-                <img id="imagem-resultado" class="preview-desenho" alt="Obra de Arte Romântica">
+                <img id="imagem-resultado" class="preview-desenho" alt="Resultado">
                 <div class="comparacao">
                     <div class="bloco-revelacao">
                         <span>Tema Proposto:</span>
@@ -399,7 +453,6 @@
     </div>
 
     <script>
-        // --- BANCO DE DADOS DE TEMAS NÃO REPETITIVOS ---
         const bancoTemas = [
             { tema: "O Nosso Começo Absoluto", dialogo: "Qual detalhe bobo do dia em que nos conhecemos você lembra e acha que o outro já esqueceu?" },
             { tema: "O Primeiro Beijo", dialogo: "O que causou mais frio na barriga antes de acontecer? O ambiente ou o medo do timing dar errado?" },
@@ -411,38 +464,36 @@
             { tema: "O Dia em Que Eu Te Achei Irresistível", dialogo: "Confissão direta: Detalhe o visual ou o jeito que o parceiro agiu que te deixou sem chão." }
         ];
 
-        // --- CONFIGURAÇÃO PÚBLICA DO FIREBASE REALTIME ---
-        const firebaseConfig = {
-            databaseURL: "https://tracosdoamor-default-rtdb.firebaseio.com/" 
-        };
-        
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        // CONFIGURAÇÃO DB RESERVA COLETIVA
+        const firebaseConfig = { databaseURL: "https://t-amor-realtime-default-rtdb.firebaseio.com/" };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Variáveis Globais de Estado Realtime
         let ID_SALA = "";
-        let MEU_PAPEL = ""; // "CRIADOR" ou "CONVIDADO"
+        let MEU_PAPEL = ""; 
         let estadoSalaRef = null;
 
-        // Elementos de Interface
         const lobbyConexao = document.getElementById('lobby-conexao');
         const containerJogo = document.getElementById('container-principal-jogo');
         const btnAcao = document.getElementById('btn-acao-principal');
+        const btnEntrarLobby = document.getElementById('btn-entrar-lobby');
 
-        // Lousa de Desenho
         const canvas = document.getElementById('lousa-amor');
         const ctx = canvas.getContext('2d');
         let desenhando = false;
         let corAtual = '#ff4d6d';
 
-        // --- CONEXÃO E GERENCIAMENTO DE SALAS ---
+        function ajustarAlturaMobile() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        window.addEventListener('resize', ajustarAlturaMobile);
+        ajustarAlturaMobile();
+
         function criarSala() {
+            document.getElementById('btn-criar-lobby').innerText = "Criando... ⏳";
             ID_SALA = Math.floor(1000 + Math.random() * 9000).toString();
             MEU_PAPEL = "CRIADOR";
-            
-            // Sorteia tema inicial
             const indiceAleatorio = Math.floor(Math.random() * bancoTemas.length);
 
             estadoSalaRef = database.ref('salas/' + ID_SALA);
@@ -452,28 +503,42 @@
                 fraseSecreta: "",
                 desenhoBase64: "",
                 rodadaContador: 1
+            }).then(() => {
+                configurarListenersSala();
+                abrirInterfaceJogo();
+            }).catch((err) => {
+                alert("Erro ao criar sala. Tente novamente!");
+                document.getElementById('btn-criar-lobby').innerText = "Criar Nova Sala ✨";
             });
-
-            configurarListenersSala();
-            abrirInterfaceJogo();
         }
 
         function entrarSala() {
             const campoCodigo = document.getElementById('input-codigo-sala').value.trim();
-            if(!campoCodigo) return alert("Digite o código gerado pelo seu par!");
+            if(!campoCodigo) return alert("Digite o código da sala primeiro!");
+
+            btnEntrarLobby.innerText = "Buscando Sala... 🔍";
+            btnEntrarLobby.disabled = true;
 
             ID_SALA = campoCodigo;
             MEU_PAPEL = "CONVIDADO";
             estadoSalaRef = database.ref('salas/' + ID_SALA);
 
-            estadoSalaRef.once('value', (snapshot) => {
+            // Tenta ler o nó uma única vez para checar se ele existe antes de ativar o sincronismo
+            estadoSalaRef.once('value').then((snapshot) => {
                 if(!snapshot.exists()) {
-                    alert("Sala não encontrada! Verifique o número com o seu amor.");
+                    alert("Código incorreto ou sala expirada! Peça para o seu par confirmar o número.");
+                    btnEntrarLobby.innerText = "Entrar na Sala 🔑";
+                    btnEntrarLobby.disabled = false;
                 } else {
-                    estadoSalaRef.update({ status: "PRONTO_PARA_INICIAR" });
-                    configurarListenersSala();
-                    abrirInterfaceJogo();
+                    estadoSalaRef.update({ status: "PRONTO_PARA_INICIAR" }).then(() => {
+                        configurarListenersSala();
+                        abrirInterfaceJogo();
+                    });
                 }
+            }).catch((error) => {
+                alert("Erro de conexão com o servidor. Tente novamente.");
+                btnEntrarLobby.innerText = "Entrar na Sala 🔑";
+                btnEntrarLobby.disabled = false;
             });
         }
 
@@ -481,9 +546,9 @@
             lobbyConexao.style.display = "none";
             containerJogo.style.display = "grid";
             document.getElementById('exibicao-sala-id').innerText = "Sala: " + ID_SALA;
+            setTimeout(redimensionarCanvas, 250);
         }
 
-        // --- CONTROLE DE FLUXO EM TEMPO REAL ---
         function configurarListenersSala() {
             estadoSalaRef.on('value', (snapshot) => {
                 const dados = snapshot.val();
@@ -493,47 +558,47 @@
                 document.getElementById('texto-tema').innerText = temaInfo.tema;
                 document.getElementById('texto-dialogo').innerText = temaInfo.dialogo;
 
-                // Máquina de Estados Baseada no Firebase
+                if (window.innerWidth <= 768) {
+                    document.getElementById('mobile-tema-titulo').innerText = "Tema: " + temaInfo.tema;
+                    document.getElementById('instrucao-desenho-mobile').innerText = "Desenhe: " + temaInfo.tema;
+                }
+
                 switch(dados.status) {
                     case "AGUARDANDO_PAR":
-                        renderizarTelaEspera("Esperando seu amor entrar... 👋", "Compartilhe o código " + ID_SALA + " com ele(a) para começarem!");
-                        configurarBotaoLateral("Aguardando Conexão...", true);
+                        renderizarTelaEspera("Esperando seu amor... 👋", "Mande o código " + ID_SALA + " para ele(a) conectar!");
+                        configurarBotaoLateral("Aguardando...", true);
                         break;
 
                     case "PRONTO_PARA_INICIAR":
                         if(MEU_PAPEL === "CRIADOR") {
-                            renderizarTelaEspera("Par Conectado! ❤️", "Vocês já podem começar. Clique no botão abaixo para definir o primeiro desafio.");
-                            configurarBotaoLateral("Iniciar Partida ✨", false, () => {
-                                estadoSalaRef.update({ status: "FASE_ESCRITA" });
-                            });
+                            renderizarTelaEspera("Conectados! ❤️", "Prontos para começar? Toque abaixo para definir o primeiro desafio da rodada.");
+                            configurarBotaoLateral("Começar ✨", false, () => { estadoSalaRef.update({ status: "FASE_ESCRITA" }); });
                         } else {
-                            renderizarTelaEspera("Sintonia Pronta! 🥰", "Aguardando o criador dar o pontapé inicial na rodada...");
-                            configurarBotaoLateral("Esperando Líder...", true);
+                            renderizarTelaEspera("Sintonia Pronta! 🥰", "Aguardando o criador dar o início na rodada...");
+                            configurarBotaoLateral("Aguarde...", true);
                         }
                         break;
 
                     case "FASE_ESCRITA":
-                        // O Criador escreve a frase secreta, o Convidado aguarda em segredo
                         if(MEU_PAPEL === "CRIADOR") {
                             mostrarApenasSubtela("fase-escrita");
-                            document.getElementById('label-rodada').innerText = "Passo 1: Seu Segredo";
-                            configurarBotaoLateral("Enviar Frase Oculta 🔒", false, EnviarFraseSecreta);
+                            document.getElementById('label-rodada').innerText = "Passo 1: Escrever";
+                            configurarBotaoLateral("Travar 🔒", false, EnviarFraseSecreta);
                         } else {
-                            renderizarTelaEspera("Seu par está pensando... 🤔", "Ele está digitando uma memória secreta baseada no tema ao lado. Prepare o coração!");
-                            configurarBotaoLateral("Eles estão escrevendo...", true);
+                            renderizarTelaEspera("Escrevendo... 🤔", "Seu par está digitando uma memória secreta sobre este tema. Prepare-se!");
+                            configurarBotaoLateral("Pensando...", true);
                         }
                         break;
 
                     case "FASE_DESENHO":
-                        // O Convidado desenha o que foi pedido, o Criador aguarda ansioso
                         if(MEU_PAPEL === "CONVIDADO") {
                             mostrarApenasSubtela("fase-desenho");
-                            document.getElementById('label-rodada').innerText = "Passo 2: Hora de Desenhar";
-                            redimensionarCanvas();
-                            configurarBotaoLateral("Enviar Obra de Arte 🎨", false, EnviarDesenhoFinal);
+                            document.getElementById('label-rodada').innerText = "Passo 2: Desenhar";
+                            setTimeout(redimensionarCanvas, 50);
+                            configurarBotaoLateral("Enviar 🎨", false, EnviarDesenhoFinal);
                         } else {
-                            renderizarTelaEspera("Seu amor está desenhando! 🎨", "Agora ele está transformando aquela memória em traços reais na tela dele. Aguarde o resultado!");
-                            configurarBotaoLateral("Eles estão desenhando...", true);
+                            renderizarTelaEspera("Desenhando... 🎨", "Seu amor está transformando a lembrança em arte agora mesmo!");
+                            configurarBotaoLateral("Desenhando...", true);
                         }
                         break;
 
@@ -545,10 +610,8 @@
                         mostrarApenasSubtela("fase-revelacao");
                         document.getElementById('label-rodada').innerText = "Passo 3: Revelação";
 
-                        // Qualquer um pode reiniciar, reiniciando o loop trocando os papéis
-                        configurarBotaoLateral("Nova Rodada Alternada 🔄", false, () => {
+                        configurarBotaoLateral("De Novo 🔄", false, () => {
                             const novoIndiceTema = Math.floor(Math.random() * bancoTemas.length);
-                            // Inverte os papéis na próxima rodada para dinamismo total
                             MEU_PAPEL = (MEU_PAPEL === "CRIADOR") ? "CONVIDADO" : "CRIADOR";
                             
                             estadoSalaRef.update({
@@ -563,7 +626,6 @@
             });
         }
 
-        // Funções Auxiliares de Interface Sincronizada
         function mostrarApenasSubtela(idSubtela) {
             document.getElementById('fase-espera').style.display = "none";
             document.getElementById('fase-escrita').style.display = "none";
@@ -574,7 +636,7 @@
 
         function renderizarTelaEspera(titulo, sub) {
             mostrarApenasSubtela("fase-espera");
-            document.getElementById('fase-espera').querySelector('h2').innerText = titulo;
+            document.getElementById('titulo-espera').innerText = titulo;
             document.getElementById('texto-espera').innerText = sub;
         }
 
@@ -586,37 +648,37 @@
 
         function EnviarFraseSecreta() {
             const frase = document.getElementById('campo-frase-secreta').value.trim();
-            if(!frase) return alert("Escreva algo romântico ou especial antes de submeter!");
-            
-            estadoSalaRef.update({
-                fraseSecreta: frase,
-                status: "FASE_DESENHO"
-            });
+            if(!frase) return alert("Escreva a sua descrição antes de enviar!");
+            estadoSalaRef.update({ fraseSecreta: frase, status: "FASE_DESENHO" });
             document.getElementById('campo-frase-secreta').value = "";
         }
 
         function EnviarDesenhoFinal() {
             const imagemData = canvas.toDataURL();
-            estadoSalaRef.update({
-                desenhoBase64: imagemData,
-                status: "FASE_REVELACAO"
-            });
+            estadoSalaRef.update({ desenhoBase64: imagemData, status: "FASE_REVELACAO" });
             limparLousa();
         }
 
-        // --- SISTEMA INTERNO DA LOUSA DE DESENHO ---
+        // --- LOUSA DE DESENHO ---
         function redimensionarCanvas() {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            const wrapper = canvas.parentElement;
+            canvas.width = wrapper.clientWidth;
+            canvas.height = wrapper.clientHeight;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            ctx.lineWidth = 4.5;
+            ctx.lineWidth = 4.0;
         }
 
         function obterCoordenadas(e) {
             const rect = canvas.getBoundingClientRect();
-            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
@@ -625,7 +687,7 @@
             const pos = obterCoordenadas(e);
             ctx.beginPath();
             ctx.moveTo(pos.x, pos.y);
-            if(e.touches) e.preventDefault();
+            if(e.cancelable) e.preventDefault();
         }
 
         function moverDesenho(e) {
@@ -634,7 +696,7 @@
             ctx.strokeStyle = corAtual;
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
-            if(e.touches) e.preventDefault();
+            if(e.cancelable) e.preventDefault();
         }
 
         function pararDesenho() { desenhando = false; ctx.beginPath(); }
@@ -658,7 +720,11 @@
             ctx.beginPath();
         }
 
-        window.addEventListener('resize', () => { if(document.getElementById('fase-desenho').style.display === "flex") redimensionarCanvas(); });
+        window.addEventListener('resize', () => {
+            if(document.getElementById('fase-desenho').style.display === "flex") {
+                redimensionarCanvas();
+            }
+        });
     </script>
 </body>
 </html>
